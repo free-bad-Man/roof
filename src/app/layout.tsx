@@ -1,5 +1,8 @@
 import type { Metadata } from 'next';
 import './globals.css';
+import { SiteHeader } from '@/components/layout/SiteHeader';
+import { SiteFooter } from '@/components/layout/SiteFooter';
+import { MobileStickyBar } from '@/components/layout/MobileStickyBar';
 
 export const metadata: Metadata = {
   title: 'Крымская Кровельная',
@@ -13,7 +16,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ru">
-      <body>{children}</body>
+      <body>
+        <SiteHeader />
+        {children}
+        <SiteFooter />
+        <MobileStickyBar />
+      </body>
     </html>
   );
 }
