@@ -1,9 +1,12 @@
 import type { NextRequest } from 'next/server';
-import type { LeadRequestPayload, LeadResponsePayload } from '@/shared/types/lead';
+import type {
+  LeadRequestPayload,
+  LeadResponsePayload,
+} from '@/shared/types/lead';
 
 function badRequest(message: string, status = 400) {
-  return Response.json<LeadResponsePayload>(
-    { ok: false, message },
+  return Response.json(
+    { ok: false, message } satisfies LeadResponsePayload,
     { status },
   );
 }
@@ -51,8 +54,8 @@ export async function POST(request: NextRequest) {
     return badRequest('Не удалось передать заявку в CRM-интеграцию.', 502);
   }
 
-  return Response.json<LeadResponsePayload>({
+  return Response.json({
     ok: true,
     message: 'Заявка отправлена. Мы свяжемся с вами в ближайшее время.',
-  });
+  } satisfies LeadResponsePayload);
 }

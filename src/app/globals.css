@@ -1,3 +1,5 @@
+@import "tailwindcss";
+
 :root {
   --brand-graphite: #1f2430;
   --brand-graphite-dark: #121722;
