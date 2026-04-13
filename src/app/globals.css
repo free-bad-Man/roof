@@ -1,0 +1,47 @@
+@import "tailwindcss";
+
+:root {
+  --font-body: system-ui, sans-serif;
+  --font-heading: system-ui, sans-serif;
+  --brand-graphite: #1f2430;
+  --brand-graphite-dark: #121722;
+  --brand-red: #d62828;
+  --brand-red-dark: #b71c1c;
+  --brand-bg: #f5f6f8;
+  --brand-white: #ffffff;
+  --brand-muted: #5f6772;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--brand-bg);
+  color: var(--brand-graphite);
+  font-family: var(--font-body);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  margin: 0;
+  font-family: var(--font-heading);
+}
+
+p {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}

@@ -1,0 +1,54 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: roof-db
+    restart: unless-stopped
+    env_file:
+      - /opt/roof/env/.env.db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - roof_network
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: roof-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - /opt/roof/env/.env.production
+      - /opt/roof/env/.env.db
+    ports:
+      - "127.0.0.1:3000:3000"
+    command: >
+      sh -lc "
+      if [ -f package-lock.json ]; then npm run start;
+      elif [ -f yarn.lock ]; then yarn start;
+      elif [ -f pnpm-lock.yaml ]; then pnpm start;
+      else npm run start;
+      fi"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/ || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    networks:
+      - roof_network
+
+volumes:
+  postgres_data:
+    name: roof_postgres_data
+
+networks:
+  roof_network:
+    name: roof_network
