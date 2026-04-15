@@ -1,47 +1,35 @@
-'use client';
+"use client";
 
-import { useMemo } from 'react';
+import { useMemo } from "react";
 
-type LeadFormVariant = 'main' | 'service' | 'inspection';
+type LeadFormVariant = "main" | "service" | "inspection";
 
 type LeadFormProps = {
   variant?: LeadFormVariant;
   title?: string;
   subtitle?: string;
-  serviceHiddenValue?: string;
 };
 
 export function LeadForm({
-  variant = 'main',
-  title = 'Получить консультацию и расчёт',
-  subtitle = 'Опишите задачу — сориентируем по решению и следующим шагам.',
-  serviceHiddenValue,
+  variant = "main",
+  title = "Получить консультацию и расчёт",
+  subtitle = "Опишите задачу — сориентируем по решению и следующим шагам.",
 }: LeadFormProps) {
   const submitLabel = useMemo(() => {
-    if (variant === 'inspection') return 'Отправить фото / запросить замер';
-    if (variant === 'service') return 'Отправить заявку';
-    return 'Получить предварительное решение';
+    if (variant === "inspection") return "Отправить фото / запросить замер";
+    if (variant === "service") return "Отправить заявку";
+    return "Получить предварительное решение";
   }, [variant]);
 
   return (
-    <section
-      id={variant === 'main' ? 'lead-form' : undefined}
-      className="mx-auto max-w-7xl px-4 py-14 md:px-6 lg:px-8"
-    >
+    <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 lg:px-8">
       <div className="grid gap-8 rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm md:grid-cols-[1fr_.9fr] md:p-8">
         <div className="max-w-2xl">
-          <h2 className="text-3xl font-extrabold tracking-tight text-neutral-950 md:text-4xl">
-            {title}
-          </h2>
-
-          <p className="mt-4 text-base leading-7 text-neutral-600">
-            {subtitle}
-          </p>
+          <h2 className="text-3xl font-extrabold tracking-tight text-neutral-950 md:text-4xl">{title}</h2>
+          <p className="mt-4 text-base leading-7 text-neutral-600">{subtitle}</p>
 
           <div className="mt-6 rounded-2xl bg-neutral-50 p-4">
-            <p className="text-sm font-semibold text-neutral-950">
-              Что лучше указать сразу
-            </p>
+            <p className="text-sm font-semibold text-neutral-950">Что лучше указать сразу</p>
             <ul className="mt-3 space-y-2 text-sm leading-6 text-neutral-600">
               <li>— город</li>
               <li>— тип объекта</li>
@@ -51,21 +39,14 @@ export function LeadForm({
           </div>
 
           <p className="mt-4 text-sm leading-6 text-neutral-600">
-            Для предварительной оценки можно прислать 2–4 фото объекта. Это
-            помогает быстрее понять, целесообразен ли ремонт, восстановление,
-            гидроизоляция или уже нужна замена.
+            Для предварительной оценки можно прислать 2–4 фото объекта. Это помогает быстрее понять, целесообразен ли
+            ремонт, восстановление, гидроизоляция или уже нужна замена.
           </p>
         </div>
 
         <form className="space-y-4 rounded-2xl border border-neutral-200 bg-neutral-50 p-5">
-          {serviceHiddenValue ? (
-            <input type="hidden" name="service" value={serviceHiddenValue} />
-          ) : null}
-
           <div>
-            <label className="mb-2 block text-sm font-medium text-neutral-800">
-              Имя
-            </label>
+            <label className="mb-2 block text-sm font-medium text-neutral-800">Имя</label>
             <input
               type="text"
               name="name"
@@ -75,9 +56,7 @@ export function LeadForm({
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-neutral-800">
-              Телефон
-            </label>
+            <label className="mb-2 block text-sm font-medium text-neutral-800">Телефон</label>
             <input
               type="tel"
               name="phone"
@@ -86,17 +65,10 @@ export function LeadForm({
             />
           </div>
 
-          {(variant === 'main' || variant === 'service') ? (
+          {(variant === "main" || variant === "service") && (
             <div>
-              <label className="mb-2 block text-sm font-medium text-neutral-800">
-                Услуга
-              </label>
-              <select
-                name="serviceSelect"
-                defaultValue={serviceHiddenValue ?? ''}
-                className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-neutral-950"
-              >
-                <option value="">Выберите услугу</option>
+              <label className="mb-2 block text-sm font-medium text-neutral-800">Услуга</label>
+              <select className="w-full rounded-xl border border-neutral-300 bg-white px-4 py-3 text-sm outline-none transition focus:border-neutral-950">
                 <option>Ремонт кровли</option>
                 <option>Восстановление кровли</option>
                 <option>Гидроизоляция кровли</option>
@@ -106,12 +78,10 @@ export function LeadForm({
                 <option>Натяжные потолки</option>
               </select>
             </div>
-          ) : null}
+          )}
 
           <div>
-            <label className="mb-2 block text-sm font-medium text-neutral-800">
-              Кратко опишите задачу
-            </label>
+            <label className="mb-2 block text-sm font-medium text-neutral-800">Кратко опишите задачу</label>
             <textarea
               name="message"
               rows={4}
@@ -128,12 +98,11 @@ export function LeadForm({
           </button>
 
           <p className="text-xs leading-5 text-neutral-500">
-            После отправки заявки можно продолжить общение и прислать фото
-            объекта в Telegram.
+            После отправки заявки можно продолжить общение и прислать фото объекта в Telegram.
           </p>
 
           <a
-            href="https://t.me/krymskaya.krovelnaya"
+            href="https://t.me/krymskaya_krovelnaya"
             target="_blank"
             rel="noreferrer"
             className="inline-flex text-sm font-semibold text-neutral-950 transition hover:text-red-700"

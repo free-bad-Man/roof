@@ -51,6 +51,10 @@ function nowIso() {
   return new Date().toISOString();
 }
 
+function ensureTrailingSlash(value: string) {
+  return value.endsWith('/') ? value : `${value}/`;
+}
+
 function getStoragePath() {
   const configured =
     process.env.AMOCRM_EXTERNAL_INSTALL_STORAGE_PATH?.trim() || '';
@@ -65,11 +69,19 @@ function getStoragePath() {
 }
 
 export function getExternalRedirectUri() {
-  return (
+  const explicit =
     process.env.AMOCRM_EXTERNAL_REDIRECT_URI?.trim() ||
-    process.env.AMOCRM_REDIRECT_URI?.trim() ||
-    `${process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000'}/api/amo/oauth/callback`
-  );
+    process.env.AMOCRM_REDIRECT_URI?.trim();
+
+  if (explicit) {
+    return ensureTrailingSlash(explicit);
+  }
+
+  const siteUrl = (
+    process.env.NEXT_PUBLIC_SITE_URL?.trim() || 'http://localhost:3000'
+  ).replace(/\/+$/, '');
+
+  return `${siteUrl}/api/amo/oauth/callback/`;
 }
 
 function normalizeAmoBaseUrl(input?: string | null) {

@@ -10,41 +10,50 @@ import { buildMetadata } from '@/shared/lib/metadata';
 
 export const dynamicParams = false;
 
+type ArticlePageParams = {
+  slug: string;
+};
+
+type ArticlePageProps = {
+  params: Promise<ArticlePageParams>;
+};
+
 export function generateStaticParams() {
   return getArticleStaticParams();
 }
 
 export async function generateMetadata({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}): Promise<Metadata> {
+}: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
-  const item = getArticleBySlug(slug);
+  const article = getArticleBySlug(slug);
 
-  if (!item) {
+  if (!article) {
     return {};
   }
 
   return buildMetadata({
     path: `/stati/${slug}/`,
     seo: getArticleSeoEntry(slug),
-    fallbackTitle: item.title,
-    fallbackDescription: item.excerpt,
+    fallbackTitle: article.title,
+    fallbackDescription: article.excerpt,
   });
 }
 
 export default async function ArticleDetailPage({
   params,
-}: {
-  params: Promise<{ slug: string }>;
-}) {
+}: ArticlePageProps) {
   const { slug } = await params;
-  const item = getArticleBySlug(slug);
+  const article = getArticleBySlug(slug);
 
-  if (!item) {
-    return notFound();
+  if (!article) {
+    notFound();
   }
 
-  return <ArticlePageTemplate excerpt={item.excerpt} title={item.title} />;
+  return (
+    <ArticlePageTemplate
+      title={article.title}
+      excerpt={article.excerpt}
+    />
+  );
 }
