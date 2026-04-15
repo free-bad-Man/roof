@@ -44,18 +44,20 @@ export const heroBullets = [
   'Работаем по Симферополю и Крыму',
 ];
 
-const serviceOrder = [
+const serviceOrder: string[] = [
   'remont-krovli',
   'gidroizolyatsiya-krovli',
   'vosstanovlenie-myagkoy-krovli-sinzatim',
   'ustranenie-protechek',
   'vosstanovlenie-krovli',
-  'krovlya-pod-klyuch',
   'balkony-i-terrasy',
+  'krovlya-pod-klyuch',
   'pod-klyuch',
-] as const;
+];
 
-const serviceOrderMap = new Map(serviceOrder.map((slug, index) => [slug, index]));
+const serviceOrderMap = new Map<string, number>(
+  serviceOrder.map((slug, index) => [slug, index]),
+);
 
 export const services: ServiceCard[] = getServiceRegistry()
   .map((item) => ({
