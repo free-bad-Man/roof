@@ -35,7 +35,24 @@ export async function GET(request: Request) {
   const fromWidget = url.searchParams.get('from_widget')?.trim() ?? '';
   const error = url.searchParams.get('error')?.trim() ?? '';
 
+  console.log('[amo external callback] incoming request', {
+    url: request.url,
+    codePresent: Boolean(code),
+    referer,
+    state,
+    fromWidget,
+    error,
+    redirectUri: getExternalRedirectUri(),
+  });
+
   if (error) {
+    console.error('[amo external callback] amoCRM returned error', {
+      error,
+      referer,
+      state,
+      fromWidget,
+    });
+
     return html(
       `
       <!doctype html>
@@ -56,6 +73,12 @@ export async function GET(request: Request) {
   }
 
   if (!code) {
+    console.warn('[amo external callback] no authorization code', {
+      referer,
+      state,
+      fromWidget,
+    });
+
     return html(
       `
       <!doctype html>
@@ -80,7 +103,20 @@ export async function GET(request: Request) {
     referer: referer || null,
   });
 
+  console.log('[amo external callback] install lookup result', {
+    found: Boolean(install),
+    installKey: install?.key ?? null,
+    installState: install?.state ?? null,
+    installBaseUrl: install?.baseUrl ?? null,
+  });
+
   if (!install) {
+    console.error('[amo external callback] install payload not found', {
+      referer,
+      state,
+      fromWidget,
+    });
+
     return html(
       `
       <!doctype html>
@@ -111,11 +147,23 @@ export async function GET(request: Request) {
       install,
     });
 
+    console.log('[amo external callback] token exchange success', {
+      installKey: install.key,
+      baseUrl: tokens.baseUrl,
+      expiresAt: tokens.expiresAt,
+      fromWidget,
+    });
+
     await saveTokensForInstall({
       installKey: install.key,
       tokens,
       code,
       ...(fromWidget ? { fromWidget } : {}),
+    });
+
+    console.log('[amo external callback] tokens saved', {
+      installKey: install.key,
+      baseUrl: tokens.baseUrl,
     });
 
     return html(`
@@ -134,13 +182,20 @@ export async function GET(request: Request) {
             <li>State: <code>${escapeHtml(install.state ?? '-')}</code></li>
             <li>From widget: <code>${escapeHtml(fromWidget || 'false')}</code></li>
           </ul>
-          <p>Дальше можно переносить актуальные ключи в env или подключать следующий patch, который переведёт <code>/api/leads</code> на это хранилище.</p>
         </body>
       </html>
     `);
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Unknown amoCRM OAuth error';
+
+    console.error('[amo external callback] token exchange failed', {
+      message,
+      referer,
+      state,
+      fromWidget,
+      installKey: install.key,
+    });
 
     return html(
       `

@@ -77,12 +77,25 @@ async function handleInstall(request: Request) {
   const body = request.method === 'POST' ? await readBodyMap(request) : {};
   const input = mergeParams(url, body);
 
+  console.log('[amo external install] incoming request', {
+    method: request.method,
+    url: request.url,
+    input,
+  });
+
   const clientId = input.client_id;
   const clientSecret = input.client_secret;
   const state = input.state;
   const referer = input.referer;
 
   if (!isNonEmptyString(clientId) || !isNonEmptyString(clientSecret)) {
+    console.error('[amo external install] missing credentials', {
+      hasClientId: Boolean(clientId),
+      hasClientSecret: Boolean(clientSecret),
+      state,
+      referer,
+    });
+
     return Response.json(
       {
         ok: false,
@@ -97,6 +110,14 @@ async function handleInstall(request: Request) {
     clientSecret,
     ...(isNonEmptyString(state) ? { state } : {}),
     ...(isNonEmptyString(referer) ? { referer } : {}),
+  });
+
+  console.log('[amo external install] payload saved', {
+    key: record.key,
+    state: record.state ?? null,
+    referer: record.referer ?? null,
+    baseUrl: record.baseUrl ?? null,
+    redirectUri: getExternalRedirectUri(),
   });
 
   return Response.json({

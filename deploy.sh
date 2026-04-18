@@ -8,7 +8,6 @@ BACKUP_DIR="/opt/roof/backups/postgres"
 TIMESTAMP="$(date +%F_%H-%M-%S)"
 
 cd "$APP_DIR"
-
 mkdir -p "$BACKUP_DIR"
 
 echo "[1/7] Update code from main"
@@ -33,8 +32,12 @@ find "$BACKUP_DIR" -type f -name '*.sql.gz' | sort | head -n -7 | xargs -r rm -f
 echo "[4/7] Build application image"
 docker compose --env-file "$ENV_FILE" build app
 
-echo "[5/7] Apply Prisma migrations"
-docker compose --env-file "$ENV_FILE" run --rm app sh -lc 'npx prisma migrate deploy'
+if [ -f "$APP_DIR/prisma/schema.prisma" ]; then
+  echo "[5/7] Apply Prisma migrations"
+  docker compose --env-file "$ENV_FILE" run --rm app sh -lc 'npx prisma migrate deploy'
+else
+  echo "[5/7] Skip Prisma migrations (prisma/schema.prisma not found)"
+fi
 
 echo "[6/7] Restart application"
 docker compose --env-file "$ENV_FILE" up -d app

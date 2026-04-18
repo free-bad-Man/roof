@@ -29,6 +29,8 @@ services:
       - /opt/roof/env/.env.db
     ports:
       - "127.0.0.1:3000:3000"
+    volumes:
+      - /opt/roof/app/.runtime:/app/.runtime
     command: >
       sh -lc "
       if [ -f package-lock.json ]; then npm run start;
