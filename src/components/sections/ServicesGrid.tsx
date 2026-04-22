@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-type ServiceItem = {
+type ServiceGridItem = {
   href: string;
   title: string;
   excerpt: string;
@@ -8,9 +8,9 @@ type ServiceItem = {
 };
 
 type ServicesGridProps = {
-  title?: string;
+  title: string;
   subtitle?: string;
-  items: ServiceItem[];
+  items: ServiceGridItem[];
 };
 
 export function ServicesGrid({
@@ -18,98 +18,64 @@ export function ServicesGrid({
   subtitle,
   items,
 }: ServicesGridProps) {
-  const featured = items.slice(0, 3);
-  const regular = items.slice(3);
-
   return (
-    <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 lg:px-8">
-      {(title || subtitle) ? (
-        <div className="mb-8 max-w-3xl">
-          {title ? (
-            <h2 className="text-3xl font-extrabold tracking-tight text-neutral-950 md:text-4xl">
+    <section className="mx-auto mt-10 max-w-[1480px] px-4 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1180px]">
+        <div className="rounded-[28px] border border-white/18 bg-white/32 p-6 backdrop-blur-md shadow-[0_18px_40px_rgba(15,23,42,0.08)] md:p-8">
+          <div className="max-w-[860px]">
+            <h2 className="bg-gradient-to-r from-[var(--brand-graphite)] via-[#283244] to-[#9c6444] bg-clip-text text-[30px] font-semibold leading-[1.05] tracking-[-0.03em] text-transparent md:text-[38px] lg:text-[46px]">
               {title}
             </h2>
-          ) : null}
-          {subtitle ? (
-            <p className="mt-3 text-base leading-7 text-neutral-600">
-              {subtitle}
-            </p>
-          ) : null}
-        </div>
-      ) : null}
 
-      <div className="grid gap-5 md:grid-cols-3">
-        {featured.map((item) => (
-          <article
-            key={item.href}
-            className="rounded-3xl border border-neutral-200 bg-white p-6 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            {item.price ? (
-              <p className="mb-4 inline-flex rounded-full bg-red-50 px-3 py-1 text-sm font-semibold text-red-700">
-                {item.price}
+            {subtitle ? (
+              <p className="mt-4 max-w-[780px] text-[17px] leading-8 text-[var(--brand-graphite)]/68">
+                {subtitle}
               </p>
             ) : null}
+          </div>
+        </div>
 
-            <h3 className="text-xl font-bold tracking-tight text-neutral-950">
-              {item.title}
-            </h3>
-
-            <p className="mt-3 text-sm leading-6 text-neutral-600">
-              {item.excerpt}
-            </p>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                href={item.href}
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-neutral-950 px-4 text-sm font-semibold text-white transition hover:bg-neutral-800"
-              >
-                Подробнее
-              </Link>
-
-              <Link
-                href="/kontakty/"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50"
-              >
-                Отправить фото
-              </Link>
-            </div>
-          </article>
-        ))}
-      </div>
-
-      {regular.length > 0 ? (
-        <div className="mt-5 grid gap-5 md:grid-cols-3">
-          {regular.map((item) => (
+        <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
+          {items.map((item) => (
             <article
               key={item.href}
-              className="rounded-3xl border border-neutral-200 bg-neutral-50 p-5 transition hover:bg-white"
+              className="flex h-full min-w-0 flex-col rounded-[26px] border border-white/18 bg-white/36 p-5 backdrop-blur-md shadow-[0_18px_40px_rgba(15,23,42,0.08)] transition hover:bg-white/42"
             >
               {item.price ? (
-                <p className="text-sm font-semibold text-red-700">
-                  {item.price}
-                </p>
+                <div className="mb-4">
+                  <span className="inline-flex rounded-full border border-red-200/80 bg-white/72 px-3 py-1 text-sm font-semibold text-red-700">
+                    {item.price}
+                  </span>
+                </div>
               ) : null}
 
-              <h3 className="mt-2 text-lg font-bold tracking-tight text-neutral-950">
+              <h3 className="max-w-[22ch] text-[21px] font-semibold leading-[1.18] tracking-[-0.02em] text-[var(--brand-graphite)] md:text-[24px]">
                 {item.title}
               </h3>
 
-              <p className="mt-2 text-sm leading-6 text-neutral-600">
+              <p className="mt-4 flex-1 text-[16px] leading-8 text-[var(--brand-graphite)]/72">
                 {item.excerpt}
               </p>
 
-              <div className="mt-4">
+              <div className="mt-6 flex items-center justify-between gap-3">
                 <Link
                   href={item.href}
-                  className="text-sm font-semibold text-neutral-950 transition hover:text-red-700"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--brand-red-dark)]"
                 >
-                  Смотреть услугу →
+                  Подробнее
+                </Link>
+
+                <Link
+                  href="/kontakty/"
+                  className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/24 bg-white/68 px-5 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white/82"
+                >
+                  Отправить фото
                 </Link>
               </div>
             </article>
           ))}
         </div>
-      ) : null}
+      </div>
     </section>
   );
 }

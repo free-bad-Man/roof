@@ -18,13 +18,23 @@
 
 html {
   scroll-behavior: smooth;
+  min-height: 100%;
 }
 
 body {
   margin: 0;
-  background: var(--brand-bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+  background: transparent;
   color: var(--brand-graphite);
   font-family: var(--font-body);
+}
+
+main,
+header,
+footer,
+section {
+  background-color: transparent;
 }
 
 h1,

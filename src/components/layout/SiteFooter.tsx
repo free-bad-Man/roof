@@ -1,110 +1,89 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { company } from '@/shared/data/site';
 
-const footerNav = [
-  { href: '/krovelnye-raboty/', label: 'Кровельные работы' },
-  { href: '/nashi-raboty/', label: 'Наши работы' },
-  { href: '/o-kompanii/', label: 'О компании' },
-  { href: '/kontakty/', label: 'Контакты' },
-];
-
 export function SiteFooter() {
   return (
-    <footer className="border-t border-black/10 bg-white">
-      <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 md:grid-cols-[1.25fr_.85fr_.9fr] md:px-6">
-        <div className="space-y-5">
-          <div>
-            <div className="text-sm font-extrabold uppercase tracking-[0.12em] text-[var(--brand-graphite)]">
-              {company.marketingName}
-            </div>
-
-            <p className="mt-3 max-w-md text-sm leading-7 text-[var(--brand-muted)]">
-              {company.descriptor}
-            </p>
-          </div>
-
-          <div className="rounded-3xl border border-black/10 bg-[var(--brand-surface)] p-5">
-            <div className="text-sm font-semibold text-[var(--brand-graphite)]">
-              Есть протечка или нужно понять состояние кровли?
-            </div>
-
-            <p className="mt-3 text-sm leading-7 text-[var(--brand-muted)]">
-              Пришлите 2–4 фото объекта, город и краткое описание проблемы.
-              Подскажем, что целесообразно в вашем случае: ремонт,
-              восстановление, гидроизоляция или замена.
-            </p>
-
-            <div className="mt-4">
-              <Link
-                href="/kontakty/"
-                className="inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition hover:opacity-90"
-              >
-                Отправить фото объекта
-              </Link>
-            </div>
-          </div>
-
-          <p className="text-sm leading-7 text-[var(--brand-muted)]">
-            {company.geoLine}
-          </p>
-        </div>
-
-        <div>
-          <div className="text-sm font-semibold text-[var(--brand-graphite)]">
-            Навигация
-          </div>
-
-          <div className="mt-4 flex flex-col gap-3">
-            {footerNav.map((item) => (
-              <Link
-                key={item.href}
-                className="text-sm text-[var(--brand-muted)] transition hover:text-[var(--brand-red)]"
-                href={item.href}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <div className="text-sm font-semibold text-[var(--brand-graphite)]">
-            Контакты
-          </div>
-
-          <div className="mt-4 space-y-3 text-sm text-[var(--brand-muted)]">
-            <div>
+    <footer className="mx-auto mt-10 max-w-[1760px] px-3 pb-0 sm:px-4 lg:px-6">
+      <div className="mx-auto rounded-t-[32px] border-x border-t border-white/12 bg-white/6 px-4 py-5 backdrop-blur-md sm:px-6 lg:px-8">
+        <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+          <div className="grid flex-1 gap-5 md:grid-cols-3 md:gap-6">
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--brand-muted)]">
+                Телефон
+              </p>
               <a
                 href={company.phoneHref}
-                className="transition hover:text-[var(--brand-red)]"
+                className="mt-2 block text-[28px] font-semibold leading-none text-[var(--brand-graphite)] transition hover:text-[var(--brand-red)]"
               >
                 {company.phone}
               </a>
+
+              <Link
+                href="/kontakty/"
+                className="mt-4 inline-flex min-h-11 items-center justify-center rounded-xl bg-[var(--brand-red)] px-5 text-sm font-semibold text-white transition hover:bg-[var(--brand-red-dark)]"
+              >
+                Получить предварительное решение
+              </Link>
             </div>
 
-            <div>
+            <div className="min-w-0">
+              <p className="text-[16px] font-semibold leading-6 text-[var(--brand-graphite)]">
+                Telegram:
+              </p>
               <a
-                href={company.telegramHref}
+                href="https://t.me/krymskaya.krovelnaya"
                 target="_blank"
                 rel="noreferrer"
-                className="transition hover:text-[var(--brand-red)]"
+                className="mt-1 block text-[16px] leading-7 text-[var(--brand-graphite)] transition hover:text-[var(--brand-red)]"
               >
-                {company.telegram}
+                @krymskaya.krovelnaya
               </a>
-            </div>
 
-            <div>
+              <p className="mt-5 text-[16px] font-semibold leading-6 text-[var(--brand-graphite)]">
+                Email:
+              </p>
               <a
-                href={company.emailHref}
-                className="transition hover:text-[var(--brand-red)]"
+                href="mailto:krymskaya-krovelnaya@yandex.ru"
+                className="mt-1 block text-[16px] leading-7 text-[var(--brand-graphite)] transition hover:text-[var(--brand-red)]"
               >
-                {company.email}
+                krymskaya-krovelnaya@yandex.ru
               </a>
             </div>
 
-            <div>{company.address}</div>
-            <div>{company.worktime}</div>
+            <div className="min-w-0">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--brand-muted)]">
+                Адрес
+              </p>
+              <p className="mt-2 text-[16px] leading-7 text-[var(--brand-graphite)]">
+                Симферополь, ул. Лавриненко, 9
+              </p>
+
+              <p className="mt-4 text-[11px] font-semibold uppercase tracking-[0.1em] text-[var(--brand-muted)]">
+                Режим работы
+              </p>
+              <p className="mt-2 text-[16px] leading-7 text-[var(--brand-graphite)]">
+                Пн–Пт: 09:00–13:00, 14:00–18:00
+              </p>
+              <p className="text-[16px] leading-7 text-[var(--brand-graphite)]">
+                Сб–Вс: выходной
+              </p>
+            </div>
           </div>
+
+          <Link
+            href="/"
+            aria-label="Домашняя страница"
+            className="flex shrink-0 items-center justify-start lg:border-l lg:border-white/10 lg:pl-8"
+          >
+            <Image
+              src="/brand/logo/logo-horizontal-white-v2.png"
+              alt={company.marketingName}
+              width={620}
+              height={140}
+              className="h-20 w-auto sm:h-24 lg:h-[92px] xl:h-[104px]"
+            />
+          </Link>
         </div>
       </div>
     </footer>
