@@ -1,59 +1,35 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { ArticlePageTemplate } from '@/components/templates/ArticlePageTemplate';
-import {
-  getArticleBySlug,
-  getArticleSeoEntry,
-  getArticleStaticParams,
-} from '@/shared/content';
-import { buildMetadata } from '@/shared/lib/metadata';
+import { articlePages } from '@/shared/content/articles';
 
-export const dynamicParams = false;
+const PAGE_MAP = {
+  'kogda-nuzhen-remont-krovli-a-kogda-zamena': articlePages.kogdaNuzhenRemontKrovliAKogdaZamena,
+  'kak-nayti-prichinu-protechki-krovli': articlePages.kakNaytiPrichinuProtechkiKrovli,
+  'mozhno-li-vosstanovit-myagkuyu-krovlyu-bez-demontazha': articlePages.mozhnoLiVosstanovitMyagkuyuKrovlyuBezDemontazha,
+} as const;
 
-type ArticlePageParams = {
-  slug: string;
-};
-
-type ArticlePageProps = {
-  params: Promise<ArticlePageParams>;
+type PageProps = {
+  params: {
+    slug: string;
+  };
 };
 
 export function generateStaticParams() {
-  return getArticleStaticParams();
+  return Object.keys(PAGE_MAP).map((slug) => ({ slug }));
 }
 
-export async function generateMetadata({
-  params,
-}: ArticlePageProps): Promise<Metadata> {
-  const { slug } = await params;
-  const article = getArticleBySlug(slug);
-
-  if (!article) {
-    return {};
-  }
-
-  return buildMetadata({
-    path: `/stati/${slug}/`,
-    seo: getArticleSeoEntry(slug),
-    fallbackTitle: article.title,
-    fallbackDescription: article.excerpt,
-  });
+export function generateMetadata({ params }: PageProps): Metadata {
+  const item = PAGE_MAP[params.slug as keyof typeof PAGE_MAP];
+  if (!item) return {};
+  return {
+    title: item.seoTitle,
+    description: item.seoDescription,
+  };
 }
 
-export default async function ArticleDetailPage({
-  params,
-}: ArticlePageProps) {
-  const { slug } = await params;
-  const article = getArticleBySlug(slug);
-
-  if (!article) {
-    notFound();
-  }
-
-  return (
-    <ArticlePageTemplate
-      title={article.title}
-      excerpt={article.excerpt}
-    />
-  );
+export default function Page({ params }: PageProps) {
+  const item = PAGE_MAP[params.slug as keyof typeof PAGE_MAP];
+  if (!item) notFound();
+  return <ArticlePageTemplate data={item} />;
 }

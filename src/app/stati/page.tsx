@@ -1,59 +1,62 @@
-import { articles } from '@/shared/data/site';
-import { CtaBanner } from '@/components/sections/CtaBanner';
+import type { Metadata } from 'next';
+import Link from 'next/link';
+import { articlePages } from '@/shared/content/articles';
+import { GeoBlock } from '@/components/ui/GeoBlock';
+import { PageHero } from '@/components/ui/PageHero';
+import { PhotoCta } from '@/components/ui/PhotoCta';
+import { SectionShell } from '@/components/ui/SectionShell';
 
-export default function ArticlesPage() {
+export const metadata: Metadata = {
+  title: 'Статьи — кровля, протечки, гидроизоляция',
+  description:
+    'Статьи Крымской Кровельной: когда нужен ремонт, как искать причину протечки и можно ли восстановить мягкую кровлю без демонтажа.',
+};
+
+const items = Object.values(articlePages);
+
+export default function Page() {
   return (
     <>
-      <section className="mx-auto max-w-7xl px-4 pb-8 pt-12 md:px-6 lg:px-8 lg:pt-16">
-        <div className="max-w-4xl">
-          <p className="inline-flex rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-semibold text-red-700">
-            Статьи
-          </p>
+      <PageHero
+        eyebrow="Статьи"
+        title="Статьи и разборы"
+        subtitle="Развиваем контент по модели «проблема → решение»: объясняем, как подойти к кровле, протечкам и восстановлению без шаблонных SEO-текстов."
+        bullets={[
+          'Контент-опоры: протечки, причины, кровля до/после, мягкая кровля, гидроизоляция узлов',
+          'Статьи должны усиливать доверие и профильность компании',
+          'Держим акцент на кровле как ядре бренда',
+        ]}
+      />
 
-          <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-neutral-950 md:text-5xl lg:text-6xl">
-            Разборы по кровле, протечкам и восстановлению
-          </h1>
-
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-neutral-600">
-            Здесь собираем не SEO-полотна, а прикладные материалы по проблемам и
-            решениям: когда нужен ремонт, как искать причину протечки и где
-            восстановление целесообразнее полной замены.
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 lg:px-8">
+      <SectionShell title="Первые статьи">
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-          {articles.map((item) => (
+          {items.map((item) => (
             <article
               key={item.slug}
-              className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm"
+              className="flex h-full flex-col rounded-[28px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
             >
-              <h2 className="text-2xl font-bold tracking-tight text-neutral-950">
-                {item.title}
-              </h2>
-
-              {item.excerpt ? (
-                <p className="mt-3 text-sm leading-6 text-neutral-600">
-                  {item.excerpt}
+              <div className="flex-1">
+                <h2 className="text-[24px] font-semibold leading-[1.15] tracking-[-0.02em] text-[var(--brand-graphite)]">
+                  {item.h1}
+                </h2>
+                <p className="mt-4 text-[16px] leading-7 text-[var(--brand-graphite)]/72">
+                  {item.lead}
                 </p>
-              ) : null}
+              </div>
 
-              <a
-                href={item.href}
-                className="mt-5 inline-flex text-sm font-semibold text-neutral-950 hover:text-red-700"
+              <Link
+                href={`/stati/${item.slug}/`}
+                className="mt-6 inline-flex min-h-11 items-center justify-center self-start whitespace-nowrap rounded-xl border border-white/25 bg-white/55 px-4 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white/75"
               >
-                Читать статью →
-              </a>
+                Читать статью
+              </Link>
             </article>
           ))}
         </div>
-      </section>
+      </SectionShell>
 
-      <CtaBanner
-        title="Нужно не просто читать, а понять решение по вашему объекту?"
-        text="Пришлите 2–4 фото объекта, город и краткое описание задачи. Сориентируем по возможному решению и следующему шагу."
-      />
+      <PhotoCta />
+      <GeoBlock />
     </>
   );
 }

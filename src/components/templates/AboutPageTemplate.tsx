@@ -1,30 +1,44 @@
-import { CtaBanner } from '@/components/sections/CtaBanner';
-import { GeoSection } from '@/components/sections/GeoSection';
-import { company } from '@/shared/data/site';
-import { Card } from '@/shared/ui/Card';
-import { Section } from '@/shared/ui/Section';
+import { PhotoCta } from '@/components/ui/PhotoCta';
+import { GeoBlock } from '@/components/ui/GeoBlock';
+import { PageHero } from '@/components/ui/PageHero';
+import { SectionShell } from '@/components/ui/SectionShell';
+import { companyContent } from '@/shared/content/company';
+
+const data = companyContent.about;
 
 export function AboutPageTemplate() {
   return (
     <>
-      <section className="py-12 md:py-18">
-        <div className="mx-auto max-w-5xl px-4 md:px-6">
-          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">О компании</div>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-[var(--brand-graphite)] md:text-5xl">Профильная кровельная компания в Крыму</h1>
-          <p className="mt-5 text-lg leading-8 text-[var(--brand-muted)]">
-            {company.legalName} — это профильная команда по ремонту, восстановлению и гидроизоляции кровли в Симферополе и по Крыму. Мы не позиционируем себя как универсальную стройку.
-          </p>
-        </div>
-      </section>
-      <Section title="Что важно в подаче компании">
+      <PageHero
+        eyebrow="О компании"
+        title={data.h1}
+        subtitle={data.subtitle}
+        bullets={[
+          'Профильная кровельная компания, а не универсальная стройка',
+          'Подбираем решение по состоянию объекта',
+          'Честная смета, этапы и сопровождение',
+        ]}
+      />
+
+      <SectionShell title="Кто мы" intro={data.intro} />
+
+      <SectionShell title="На чём строится подход компании" intro={data.positioning}>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {['Взрослая и собранная подача', 'Кровля — основной профиль', 'Sinzatim как усиление экспертности', 'Реальные объекты вместо шаблонных обещаний', 'Понятная смета и сопровождение', 'География: Симферополь и Крым'].map((item) => (
-            <Card key={item}><p className="text-sm leading-7 text-[var(--brand-graphite)]">{item}</p></Card>
+          {data.principles.map((item) => (
+            <div
+              key={item}
+              className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+            >
+              <p className="text-[17px] leading-8 text-[var(--brand-graphite)]/78">
+                {item}
+              </p>
+            </div>
           ))}
         </div>
-      </Section>
-      <GeoSection />
-      <CtaBanner title="Нужно обсудить объект или получить расчёт?" text="Оставьте заявку или отправьте фото объекта — подскажем следующий шаг." />
+      </SectionShell>
+
+      <PhotoCta />
+      <GeoBlock />
     </>
   );
 }
