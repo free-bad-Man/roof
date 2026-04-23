@@ -1,12 +1,20 @@
 import { LeadForm } from '@/components/forms/LeadForm';
-import { CtaBanner } from '@/components/sections/CtaBanner';
-import { FaqSection } from '@/components/sections/FaqSection';
-import { GeoSection } from '@/components/sections/GeoSection';
-import { Card } from '@/shared/ui/Card';
-import { Section } from '@/shared/ui/Section';
-import type { FaqItem } from '@/shared/types/content';
+import { CasesTeaser } from '@/components/ui/CasesTeaser';
+import { GeoBlock } from '@/components/ui/GeoBlock';
+import { PageFaq } from '@/components/ui/PageFaq';
+import { PageHero } from '@/components/ui/PageHero';
+import { PhotoCta } from '@/components/ui/PhotoCta';
+import { SectionShell } from '@/components/ui/SectionShell';
+import type { FaqItem, ServicePageData } from '@/shared/types/page';
 
-type ServicePageTemplateProps = {
+type ServiceSection =
+  | 'krovelnye-raboty'
+  | 'gidroizolyatsiya'
+  | 'natyazhnye-potolki';
+
+type LegacyServicePageTemplateProps = {
+  slug: string;
+  section: ServiceSection;
   title: string;
   subtitle: string;
   priceLabel?: string;
@@ -16,114 +24,150 @@ type ServicePageTemplateProps = {
   faq: FaqItem[];
 };
 
-export function ServicePageTemplate({
-  title,
-  subtitle,
-  priceLabel,
-  whenUseful,
-  includes,
-  advantages,
-  faq,
-}: ServicePageTemplateProps) {
+type ServicePageTemplateProps =
+  | { data: ServicePageData }
+  | LegacyServicePageTemplateProps;
+
+function isDataMode(
+  props: ServicePageTemplateProps,
+): props is { data: ServicePageData } {
+  return 'data' in props;
+}
+
+function getSectionEyebrow(section: ServiceSection) {
+  switch (section) {
+    case 'gidroizolyatsiya':
+      return 'Гидроизоляция';
+    case 'natyazhnye-potolki':
+      return 'Натяжные потолки';
+    case 'krovelnye-raboty':
+    default:
+      return 'Кровельные работы';
+  }
+}
+
+function normalizeData(props: ServicePageTemplateProps): ServicePageData {
+  if (isDataMode(props)) {
+    return props.data;
+  }
+
+  return {
+    slug: props.slug,
+    section: props.section,
+    title: props.title,
+    h1: props.title,
+    seoTitle: props.title,
+    seoDescription: props.subtitle,
+    heroSubtitle: props.subtitle,
+    priceLabel: props.priceLabel,
+    bullets: props.advantages,
+    whenItFitsTitle: 'Когда подходит услуга',
+    whenItFitsText:
+      'Ниже — ситуации, в которых это решение действительно целесообразно по состоянию объекта.',
+    signs: props.whenUseful,
+    noFullReplaceTitle: 'Почему не всегда нужна полная замена',
+    noFullReplaceText:
+      'Сначала оцениваем фактическое состояние объекта и только потом предлагаем сценарий работ. Если задачу можно решить без лишнего объёма, не уводим в ненужную полную замену.',
+    includesTitle: 'Что входит в работу',
+    includesItems: props.includes,
+    faq: props.faq,
+    relatedCases: [],
+    relatedArticles: [],
+    leadFormTitle: 'Оставить заявку по услуге',
+    leadFormSubtitle:
+      'Свяжемся, уточним детали и подскажем следующий шаг.',
+    photoCtaTitle: 'Есть фото объекта или проблемной зоны?',
+    photoCtaText:
+      'Пришлите 2–4 фото объекта, город и краткое описание проблемы. Подскажем, можно ли начать с оценки по фото или нужен выезд.',
+  };
+}
+
+export function ServicePageTemplate(props: ServicePageTemplateProps) {
+  const data = normalizeData(props);
+
   return (
     <>
-      <section className="py-12 md:py-18">
-        <div className="mx-auto grid max-w-7xl gap-8 px-4 md:grid-cols-[1.1fr_0.9fr] md:px-6">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--brand-red)]">
-              Услуга
-            </div>
-
-            <h1 className="mt-4 text-4xl font-extrabold tracking-tight text-[var(--brand-graphite)] md:text-5xl">
-              {title}
-            </h1>
-
-            <p className="mt-5 max-w-3xl text-lg leading-8 text-[var(--brand-muted)]">
-              {subtitle}
-            </p>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              {priceLabel ? (
-                <div className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-[var(--brand-graphite)] shadow-sm">
-                  {priceLabel}
-                </div>
-              ) : null}
-
-              <div className="rounded-full border border-[var(--brand-graphite)] px-5 py-3 text-sm font-semibold text-[var(--brand-graphite)]">
-                Работаем по Крыму
-              </div>
-            </div>
-
-            <ul className="mt-8 space-y-3 text-base leading-7 text-[var(--brand-graphite)]">
-              <li>— Не навязываем лишний объём работ</li>
-              <li>— Подбираем решение по состоянию объекта</li>
-              <li>— Даём понятный следующий шаг после оценки</li>
-            </ul>
-          </div>
-
-          <LeadForm
-            title="Оставить заявку по услуге"
-            subtitle="Свяжемся, уточним детали и подскажем следующий шаг."
-            serviceHiddenValue={title}
-            variant="service"
-          />
-        </div>
-      </section>
-
-      <Section title="Когда подходит услуга">
-        <div className="grid gap-4 md:grid-cols-2">
-          {whenUseful.map((item) => (
-            <Card key={item}>
-              <p className="text-sm leading-7 text-[var(--brand-graphite)]">
-                {item}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Что входит в работу">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {includes.map((item) => (
-            <Card key={item}>
-              <p className="text-sm leading-7 text-[var(--brand-graphite)]">
-                {item}
-              </p>
-            </Card>
-          ))}
-        </div>
-      </Section>
-
-      <Section title="Почему к нам обращаются по этой услуге">
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {advantages.map((item, index) => (
-            <div
-              key={item}
-              className={`rounded-[28px] border p-5 ${
-                index < 2
-                  ? 'border-black/10 bg-[var(--brand-bg)]'
-                  : 'border-black/10 bg-white'
-              }`}
-            >
-              <div className="text-sm font-semibold uppercase tracking-[0.12em] text-[var(--brand-red)]">
-                Преимущество
-              </div>
-              <p className="mt-3 text-sm leading-7 text-[var(--brand-graphite)]">
-                {item}
-              </p>
-            </div>
-          ))}
-        </div>
-      </Section>
-
-      <FaqSection items={faq} />
-
-      <CtaBanner
-        title="Отправьте фото объекта и получите предварительное решение"
-        text="Напишите город, тип объекта и кратко опишите задачу. Мы подскажем, нужен ли ремонт, восстановление, гидроизоляция или более глубокий объём работ."
+      <PageHero
+        eyebrow={getSectionEyebrow(data.section)}
+        title={data.h1}
+        subtitle={data.heroSubtitle}
+        bullets={data.bullets}
+        priceLabel={data.priceLabel}
       />
 
-      <GeoSection />
+      <SectionShell title={data.whenItFitsTitle} intro={data.whenItFitsText}>
+        {data.signs?.length ? (
+          <div className="grid gap-4 md:grid-cols-2">
+            {data.signs.map((item) => (
+              <div
+                key={item}
+                className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+              >
+                <p className="text-[17px] leading-8 text-[var(--brand-graphite)]/78">
+                  — {item}
+                </p>
+              </div>
+            ))}
+          </div>
+        ) : null}
+      </SectionShell>
+
+      <SectionShell
+        title={data.noFullReplaceTitle}
+        intro={data.noFullReplaceText}
+      />
+
+      <SectionShell title={data.includesTitle}>
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {data.includesItems.map((item) => (
+            <div
+              key={item}
+              className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+            >
+              <p className="text-[17px] leading-8 text-[var(--brand-graphite)]/78">
+                {item}
+              </p>
+            </div>
+          ))}
+        </div>
+      </SectionShell>
+
+      {data.steps?.length ? (
+        <SectionShell title={data.stepsTitle || 'Этапы работ'}>
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {data.steps.map((item, index) => (
+              <div
+                key={item}
+                className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm"
+              >
+                <p className="text-sm font-semibold text-red-700">
+                  Этап {index + 1}
+                </p>
+                <p className="mt-3 text-[17px] leading-8 text-[var(--brand-graphite)]/78">
+                  {item}
+                </p>
+              </div>
+            ))}
+          </div>
+        </SectionShell>
+      ) : null}
+
+      <CasesTeaser items={data.relatedCases || []} />
+
+      <PageFaq items={data.faq} />
+
+      <LeadForm
+        variant="service"
+        title={data.leadFormTitle || 'Оставить заявку по услуге'}
+        subtitle={
+          data.leadFormSubtitle ||
+          'Свяжемся, уточним детали и подскажем следующий шаг.'
+        }
+        serviceHiddenValue={data.title}
+      />
+
+      <PhotoCta title={data.photoCtaTitle} text={data.photoCtaText} />
+      <GeoBlock />
     </>
   );
 }
