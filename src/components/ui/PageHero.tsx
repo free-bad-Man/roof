@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import { company } from '@/shared/data/site';
 
 type PageHeroProps = {
   eyebrow?: string;
@@ -48,14 +49,16 @@ export function PageHero({
           ) : null}
 
           <div className="mt-6 grid gap-3 sm:grid-cols-[max-content_max-content] sm:items-center sm:justify-between">
-            <Link
-              href="/kontakty/"
+            <a
+              href={company.telegramHref}
+              target="_blank"
+              rel="noreferrer"
               className="inline-flex min-h-12 min-w-[228px] items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700"
             >
               Отправить фото объекта
-            </Link>
+            </a>
             <Link
-              href="/kontakty/"
+              href="#lead-form"
               className="inline-flex min-h-12 min-w-[170px] items-center justify-center rounded-xl border border-neutral-300/80 bg-white/55 px-6 text-sm font-semibold text-neutral-900 backdrop-blur-sm transition hover:bg-white/75"
             >
               Получить расчёт
