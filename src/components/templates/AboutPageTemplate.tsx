@@ -30,6 +30,7 @@ export function AboutPageTemplate() {
           'Гидроизоляция — сильный вход в проблемные объекты',
           'Sinzatim — технологическое усиление по мягкой кровле',
         ]}
+        leadHref="/kontakty/#lead-form"
       />
 
       <SectionShell
