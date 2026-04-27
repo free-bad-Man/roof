@@ -43,7 +43,7 @@ export function SiteHeader() {
           </a>
 
           <Button
-            href="/kontakty/"
+            href="/kontakty/#lead-form"
             variant="primary"
             className="whitespace-nowrap px-5 py-3"
           >
@@ -61,7 +61,7 @@ export function SiteHeader() {
           </a>
 
           <Link
-            href="/kontakty/"
+            href="/kontakty/#lead-form"
             className="inline-flex min-h-10 items-center justify-center rounded-full bg-[var(--brand-red)] px-3 text-sm font-semibold text-white transition hover:bg-[var(--brand-red-dark)]"
           >
             Фото
