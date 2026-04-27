@@ -1,33 +1,40 @@
+import Link from 'next/link';
 import { cases } from '@/shared/data/site';
-import { CtaBanner } from '@/components/sections/CtaBanner';
+import { PageHero } from '@/components/ui/PageHero';
+import { PhotoCta } from '@/components/ui/PhotoCta';
+import { SectionShell } from '@/components/ui/SectionShell';
+
+const serviceLinks = [
+  { href: '/krovelnye-raboty/', label: 'Кровельные работы' },
+  { href: '/gidroizolyatsiya/', label: 'Гидроизоляция' },
+  { href: '/krovelnye-raboty/remont-krovli/', label: 'Ремонт кровли' },
+  { href: '/gidroizolyatsiya/ustranenie-protechek/', label: 'Устранение протечек' },
+];
 
 export default function CasesPage() {
   return (
     <>
-      <section className="mx-auto max-w-7xl px-4 pb-8 pt-12 md:px-6 lg:px-8 lg:pt-16">
-        <div className="max-w-4xl">
-          <p className="inline-flex rounded-full border border-red-200 bg-red-50 px-3 py-1 text-sm font-semibold text-red-700">
-            Наши работы
-          </p>
+      <PageHero
+        eyebrow="Наши работы"
+        title="Реальные объекты и практические решения"
+        subtitle="Сильнее любых общих обещаний работают реальные кейсы: какая была проблема, какое решение выбрали и какой результат получили. Ниже — первая волна объектов по кровле, гидроизоляции и протечкам."
+        bullets={[
+          'Показываем проблему, решение и результат',
+          'Не подменяем опыт шаблонными обещаниями',
+          'Связываем кейсы с услугами и заявкой по фото',
+        ]}
+      />
 
-          <h1 className="mt-5 text-4xl font-extrabold tracking-tight text-neutral-950 md:text-5xl lg:text-6xl">
-            Реальные объекты и практические решения
-          </h1>
-
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-neutral-600">
-            Сильнее любых общих обещаний работают реальные кейсы: какая была
-            проблема, какое решение выбрали и какой результат получили. Ниже —
-            первая волна кейсов по кровле и гидроизоляции.
-          </p>
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-7xl px-4 py-14 md:px-6 lg:px-8">
+      <SectionShell
+        eyebrow="Витрина кейсов"
+        title="Объекты по кровле и гидроизоляции"
+        intro="Каждый кейс помогает понять логику подхода: сначала определить реальную проблему, затем выбрать решение по состоянию объекта и только после этого выполнять работы."
+      >
         <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {cases.map((item) => (
             <article
               key={item.slug}
-              className="rounded-3xl border border-neutral-200 bg-white p-5 shadow-sm"
+              className="flex min-h-full flex-col rounded-[28px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm md:p-6"
             >
               {item.location ? (
                 <p className="text-sm font-semibold text-red-700">
@@ -35,14 +42,14 @@ export default function CasesPage() {
                 </p>
               ) : null}
 
-              <h2 className="mt-2 text-2xl font-bold tracking-tight text-neutral-950">
+              <h2 className="mt-3 text-[24px] font-semibold leading-[1.12] tracking-[-0.03em] text-[var(--brand-graphite)]">
                 {item.title}
               </h2>
 
-              <div className="mt-4 space-y-2 text-sm leading-6 text-neutral-600">
+              <div className="mt-5 space-y-4 text-[16px] leading-7 text-[var(--brand-graphite)]/72">
                 {item.problem ? (
                   <p>
-                    <span className="font-semibold text-neutral-900">
+                    <span className="font-semibold text-[var(--brand-graphite)]">
                       Проблема:
                     </span>{' '}
                     {item.problem}
@@ -51,7 +58,7 @@ export default function CasesPage() {
 
                 {item.solution ? (
                   <p>
-                    <span className="font-semibold text-neutral-900">
+                    <span className="font-semibold text-[var(--brand-graphite)]">
                       Решение:
                     </span>{' '}
                     {item.solution}
@@ -60,7 +67,7 @@ export default function CasesPage() {
 
                 {item.result ? (
                   <p>
-                    <span className="font-semibold text-neutral-900">
+                    <span className="font-semibold text-[var(--brand-graphite)]">
                       Результат:
                     </span>{' '}
                     {item.result}
@@ -68,18 +75,36 @@ export default function CasesPage() {
                 ) : null}
               </div>
 
-              <a
+              <Link
                 href={item.href}
-                className="mt-5 inline-flex text-sm font-semibold text-neutral-950 hover:text-red-700"
+                className="mt-6 inline-flex text-sm font-semibold text-[var(--brand-graphite)] transition hover:text-red-700"
               >
                 Смотреть кейс →
-              </a>
+              </Link>
             </article>
           ))}
         </div>
-      </section>
+      </SectionShell>
 
-      <CtaBanner
+      <SectionShell
+        eyebrow="Услуги"
+        title="Связанные направления работ"
+        intro="Если у вас похожая задача, можно сразу перейти в профильный раздел услуги или отправить фото объекта для предварительной оценки."
+      >
+        <div className="flex flex-wrap gap-3">
+          {serviceLinks.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="inline-flex min-h-11 items-center rounded-xl border border-white/25 bg-white/55 px-5 text-sm font-semibold text-[var(--brand-graphite)] backdrop-blur-sm transition hover:bg-white/75 hover:text-red-700"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </SectionShell>
+
+      <PhotoCta
         title="Есть похожая задача по кровле или протечке?"
         text="Пришлите 2–4 фото объекта, город и краткое описание проблемы. Подскажем, какой формат работ целесообразен именно в вашем случае."
       />
