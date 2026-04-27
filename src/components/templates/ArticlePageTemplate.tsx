@@ -79,6 +79,7 @@ export function ArticlePageTemplate({ title, excerpt }: Props) {
           'Не подменяем диагностику шаблонным советом',
           'Ведём к практическому следующему шагу по объекту',
         ]}
+        leadHref="/kontakty/#lead-form"
       />
 
       <SectionShell
