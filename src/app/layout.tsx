@@ -1,53 +1,45 @@
 import type { Metadata } from 'next';
-import type { ReactNode } from 'react';
+import { Manrope, Montserrat } from 'next/font/google';
 import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
+import { MobileStickyBar } from '@/components/layout/MobileStickyBar';
+
+const manrope = Manrope({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+const montserrat = Montserrat({
+  subsets: ['latin', 'cyrillic'],
+  variable: '--font-heading',
+  display: 'swap',
+});
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://roof-krym.ru'),
-  title: {
-    default: 'Крымская Кровельная',
-    template: '%s | Крымская Кровельная',
-  },
-  description:
-    'Ремонт, восстановление и гидроизоляция кровли в Крыму. Подбираем решение по состоянию объекта: ремонт, восстановление, гидроизоляция или замена.',
-  applicationName: 'Крымская Кровельная',
-  keywords: [
-    'ремонт кровли',
-    'гидроизоляция кровли',
-    'восстановление кровли',
-    'устранение протечек',
-    'кровельные работы',
-    'Крым',
-    'Симферополь',
-  ],
-  openGraph: {
-    type: 'website',
-    locale: 'ru_RU',
-    siteName: 'Крымская Кровельная',
-    title: 'Крымская Кровельная',
-    description:
-      'Ремонт, восстановление и гидроизоляция кровли в Крыму. Подбираем решение по состоянию объекта.',
-  },
-  twitter: {
-    card: 'summary_large_image',
-    title: 'Крымская Кровельная',
-    description:
-      'Ремонт, восстановление и гидроизоляция кровли в Крыму. Подбираем решение по состоянию объекта.',
-  },
+  title: 'Крымская Кровельная',
+  description: 'Ремонт, восстановление и гидроизоляция кровли в Крыму',
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{ children: ReactNode }>) {
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html lang="ru">
-      <body className="min-h-screen bg-transparent text-[var(--brand-graphite)] antialiased">
-        <div className="relative min-h-screen">
+      <body className={`${manrope.variable} ${montserrat.variable}`}>
+        <div
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 z-0 bg-[url('/brand/logo/background-logo_2.png')] bg-cover bg-center bg-no-repeat"
+        />
+
+        <div className="relative z-10 min-h-screen bg-transparent">
           <SiteHeader />
-          <main>{children}</main>
+          <main className="bg-transparent">{children}</main>
           <SiteFooter />
+          <MobileStickyBar />
         </div>
       </body>
     </html>
