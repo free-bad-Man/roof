@@ -7,6 +7,7 @@ type PageHeroProps = {
   subtitle: string;
   bullets?: string[];
   priceLabel?: string;
+  leadHref?: string;
 };
 
 export function PageHero({
@@ -15,6 +16,7 @@ export function PageHero({
   subtitle,
   bullets = [],
   priceLabel,
+  leadHref = '#lead-form',
 }: PageHeroProps) {
   return (
     <section className="mx-auto max-w-[1480px] px-4 pb-4 pt-12 md:px-6 lg:px-8 lg:pt-16">
@@ -58,7 +60,7 @@ export function PageHero({
               Отправить фото объекта
             </a>
             <Link
-              href="#lead-form"
+              href={leadHref}
               className="inline-flex min-h-12 min-w-[170px] items-center justify-center rounded-xl border border-neutral-300/80 bg-white/55 px-6 text-sm font-semibold text-neutral-900 backdrop-blur-sm transition hover:bg-white/75"
             >
               Получить расчёт
