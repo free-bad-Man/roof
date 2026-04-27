@@ -1,11 +1,12 @@
 'use client';
 
-import { FormEvent, useMemo, useState } from 'react';
+import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 
 type LeadFormVariant = 'main' | 'service' | 'inspection';
 
 type LeadFormProps = {
+  id?: string;
   variant?: LeadFormVariant;
   title: string;
   subtitle?: string;
@@ -73,6 +74,7 @@ function cx(...classes: Array<string | false | null | undefined>) {
 }
 
 export function LeadForm({
+  id = 'lead-form',
   variant = 'main',
   title,
   subtitle,
@@ -152,9 +154,7 @@ export function LeadForm({
 
   const handleChange =
     (field: keyof LeadFormState) =>
-    (
-      event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>,
-    ) => {
+    (event: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
       setForm((prev) => ({
         ...prev,
         [field]: event.target.value,
@@ -210,61 +210,11 @@ export function LeadForm({
     }
   };
 
-  if (isMain) {
-    return (
-      <section
-        className={cx(
-          'mx-auto mt-10 max-w-[1180px] px-4 md:px-6 lg:px-8',
-          className,
-        )}
-      >
-        <div className="rounded-[32px] border border-white/25 bg-white/38 p-6 shadow-[0_24px_60px_rgba(15,23,42,0.12)] backdrop-blur-md md:p-8 lg:p-10">
-          <h2 className="max-w-[760px] bg-gradient-to-r from-[var(--brand-graphite)] via-[#283244] to-[#9c6444] bg-clip-text text-[32px] font-semibold leading-[1.04] tracking-[-0.03em] text-transparent md:text-[40px] lg:text-[48px]">
-            {title}
-          </h2>
-
-          {subtitle ? (
-            <p className="mt-5 max-w-[820px] text-[18px] leading-8 text-[var(--brand-graphite)]/68">
-              {subtitle}
-            </p>
-          ) : null}
-
-          <div className="mt-6 grid gap-5 lg:grid-cols-[1.15fr_0.85fr]">
-            <div className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm md:p-6">
-              <p className="text-[18px] leading-8 text-[var(--brand-graphite)]/72">
-                Если есть протечка, износ покрытия или вы не понимаете, нужен ли
-                ремонт, восстановление или замена — пришлите короткую заявку и 2–4
-                фото объекта. После этого сориентируем по решению и следующим шагам.
-              </p>
-
-              <p className="mt-5 text-[18px] leading-8 text-[var(--brand-graphite)]/72">
-                Для предварительной оценки можно прислать 2–4 фото объекта. Это
-                помогает быстрее понять, целесообразен ли ремонт, восстановление,
-                гидроизоляция или уже нужна замена.
-              </p>
-            </div>
-
-            <div className="rounded-[24px] border border-white/20 bg-white/32 p-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)] backdrop-blur-sm md:p-6">
-              <p className="text-[20px] font-semibold leading-7 text-[var(--brand-graphite)]">
-                {helperTitle}
-              </p>
-
-              <div className="mt-5 space-y-3 text-[18px] leading-8 text-[var(--brand-graphite)]/72">
-                {helperItems.map((item) => (
-                  <p key={item}>{item}</p>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section
+      id={id}
       className={cx(
-        'mx-auto mt-10 max-w-[1180px] px-4 md:px-6 lg:px-8',
+        'mx-auto mt-10 max-w-[1180px] scroll-mt-28 px-4 md:px-6 lg:px-8',
         className,
       )}
     >
@@ -387,7 +337,7 @@ export function LeadForm({
                     value={form.service}
                     onChange={handleChange('service')}
                     className="w-full rounded-[16px] border border-white/25 bg-white/70 px-4 py-3 text-[16px] text-[var(--brand-graphite)] outline-none transition focus:border-red-300 focus:bg-white"
-                    required={!isService}
+                    required
                   >
                     <option value="">Выберите услугу</option>
                     {SERVICE_OPTIONS.map((item) => (
