@@ -23,6 +23,7 @@ export default function CasesPage() {
           'Не подменяем опыт шаблонными обещаниями',
           'Связываем кейсы с услугами и заявкой по фото',
         ]}
+        leadHref="/kontakty/#lead-form"
       />
 
       <SectionShell
