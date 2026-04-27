@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { EstimateCalculator } from '@/components/calculator/EstimateCalculator';
 import { LeadForm } from '@/components/forms/LeadForm';
 import { ServicesGrid } from '@/components/sections/ServicesGrid';
 import { company } from '@/shared/data/site';
@@ -126,7 +127,7 @@ export function HomePageTemplate({
               Отправить фото объекта
             </a>
             <a
-              href="#lead-form"
+              href="#estimate-calculator"
               className="inline-flex min-h-12 min-w-[170px] items-center justify-center rounded-xl border border-neutral-300/80 bg-white/55 px-6 text-sm font-semibold text-neutral-900 backdrop-blur-sm transition hover:bg-white/75"
             >
               Получить расчёт
@@ -144,6 +145,8 @@ export function HomePageTemplate({
         title="Получите предварительное решение по вашему объекту"
         subtitle="Если есть протечка, износ покрытия или вы не понимаете, нужен ли ремонт, восстановление или замена — пришлите короткую заявку и 2–4 фото объекта. После этого сориентируем по решению и следующим шагам."
       />
+
+      <EstimateCalculator />
 
       <ServicesGrid
         title="Ключевые услуги компании"
