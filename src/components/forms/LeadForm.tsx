@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import type { LeadRequestPayload } from '@/shared/types/lead';
 
 type LeadFormVariant = 'main' | 'service' | 'inspection';
 
@@ -167,16 +168,25 @@ export function LeadForm({
     setStatus('pending');
     setErrorMessage('');
 
-    const payload = {
-      name: form.name.trim(),
-      phone: form.phone.trim(),
-      city: isMain ? '' : form.city.trim(),
-      service: resolvedService,
-      message: form.message.trim(),
+    const baseComment = form.message.trim();
+    const comment = isInspection
+      ? [baseComment, 'Нужен выезд: да / по ситуации.'].filter(Boolean).join('\n\n')
+      : baseComment;
+    const city = isMain ? '' : form.city.trim();
+
+    const payload: LeadRequestPayload = {
       source: 'Сайт',
       formName,
-      page: pathname,
-      needsVisit: isInspection ? 'Да / по ситуации' : '',
+      pagePath: pathname,
+      client: {
+        name: form.name.trim(),
+        phone: form.phone.trim(),
+      },
+      deal: {
+        ...(resolvedService ? { service: resolvedService } : {}),
+        ...(city ? { city } : {}),
+        comment,
+      },
     };
 
     try {
@@ -254,7 +264,7 @@ export function LeadForm({
             <form className="space-y-4" onSubmit={handleSubmit}>
               <input type="hidden" name="source" value="Сайт" />
               <input type="hidden" name="formName" value={formName} />
-              <input type="hidden" name="page" value={pathname} />
+              <input type="hidden" name="pagePath" value={pathname} />
               {isService && resolvedService ? (
                 <input type="hidden" name="service" value={resolvedService} />
               ) : null}
