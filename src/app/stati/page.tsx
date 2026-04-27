@@ -41,6 +41,7 @@ export default function ArticlesPage() {
           'Связываем статьи с услугами и кейсами',
           'Помогаем понять следующий шаг по объекту',
         ]}
+        leadHref="/kontakty/#lead-form"
       />
 
       <SectionShell
