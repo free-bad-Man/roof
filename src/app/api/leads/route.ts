@@ -328,11 +328,14 @@ async function getAmoAccessToken() {
     typeof json.expires_in === 'number' && Number.isFinite(json.expires_in)
       ? json.expires_in
       : 24 * 60 * 60;
+  const updatedAccessToken = json.access_token.trim();
+  const updatedRefreshToken = isNonEmptyString(json.refresh_token)
+    ? json.refresh_token.trim()
+    : refreshToken;
+
   const updatedTokenStorage: AmoTokenStorage = {
-    access_token: json.access_token.trim(),
-    refresh_token: isNonEmptyString(json.refresh_token)
-      ? json.refresh_token.trim()
-      : refreshToken,
+    access_token: updatedAccessToken,
+    refresh_token: updatedRefreshToken,
     expires_at: now + expiresInSeconds * 1000,
     base_url: updatedBaseUrl,
     updated_at: new Date(now).toISOString(),
@@ -341,7 +344,7 @@ async function getAmoAccessToken() {
   await writeAmoTokenStorage(updatedTokenStorage);
 
   return {
-    accessToken: updatedTokenStorage.access_token,
+    accessToken: updatedAccessToken,
     baseUrl: updatedBaseUrl,
   };
 }
