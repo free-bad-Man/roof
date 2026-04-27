@@ -80,7 +80,7 @@ export function LeadForm({
   serviceHiddenValue,
   lockedService,
   submitLabel,
-  submitUrl = '/api/lead',
+  submitUrl = '/api/leads',
   className,
 }: LeadFormProps) {
   const pathname = usePathname();
