@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { LeadForm } from '@/components/forms/LeadForm';
 import { ServicesGrid } from '@/components/sections/ServicesGrid';
 import { company } from '@/shared/data/site';
@@ -47,7 +48,7 @@ function GlassSection({
   children,
   className = '',
 }: {
-  children: React.ReactNode;
+  children: ReactNode;
   className?: string;
 }) {
   return (
