@@ -1,3 +1,5 @@
+import { mkdir, readFile, writeFile } from 'node:fs/promises';
+import { dirname } from 'node:path';
 import type { NextRequest } from 'next/server';
 import type {
   LeadRequestPayload,
@@ -22,11 +24,25 @@ type AmoFieldIds = Partial<
 
 type AmoAccessTokenResponse = {
   access_token: string;
+  refresh_token?: string;
+  expires_in?: number;
+  base_domain?: string;
+};
+
+type AmoTokenStorage = {
+  access_token?: string;
+  refresh_token?: string;
+  expires_at?: number;
+  base_url?: string;
+  updated_at?: string;
 };
 
 type AmoLeadResponseItem = {
   id?: number;
 };
+
+const AMO_TOKEN_REFRESH_SKEW_MS = 5 * 60 * 1000;
+const DEFAULT_AMO_TOKEN_STORAGE_PATH = '.runtime/amocrm-tokens.json';
 
 function jsonResponse(
   body: LeadResponsePayload,
@@ -163,6 +179,56 @@ function buildLeadCustomFields(
   return items;
 }
 
+function getAmoTokenStoragePath() {
+  return (
+    process.env.AMOCRM_TOKEN_STORAGE_PATH?.trim() ||
+    DEFAULT_AMO_TOKEN_STORAGE_PATH
+  );
+}
+
+async function readAmoTokenStorage(): Promise<AmoTokenStorage> {
+  try {
+    const raw = await readFile(getAmoTokenStoragePath(), 'utf8');
+    const parsed = JSON.parse(raw) as Partial<AmoTokenStorage>;
+
+    return {
+      access_token: isNonEmptyString(parsed.access_token)
+        ? parsed.access_token.trim()
+        : undefined,
+      refresh_token: isNonEmptyString(parsed.refresh_token)
+        ? parsed.refresh_token.trim()
+        : undefined,
+      expires_at:
+        typeof parsed.expires_at === 'number' && Number.isFinite(parsed.expires_at)
+          ? parsed.expires_at
+          : undefined,
+      base_url: isNonEmptyString(parsed.base_url)
+        ? parsed.base_url.trim()
+        : undefined,
+      updated_at: isNonEmptyString(parsed.updated_at)
+        ? parsed.updated_at.trim()
+        : undefined,
+    };
+  } catch (error) {
+    if (error && typeof error === 'object' && 'code' in error && error.code === 'ENOENT') {
+      return {};
+    }
+
+    throw new Error('Не удалось прочитать хранилище токенов amoCRM.');
+  }
+}
+
+async function writeAmoTokenStorage(tokenStorage: AmoTokenStorage) {
+  const storagePath = getAmoTokenStoragePath();
+
+  await mkdir(dirname(storagePath), { recursive: true });
+  await writeFile(
+    storagePath,
+    `${JSON.stringify(tokenStorage, null, 2)}\n`,
+    'utf8',
+  );
+}
+
 function getAmoConfig() {
   const baseUrl = process.env.AMOCRM_BASE_URL?.trim() ?? '';
   const clientId = process.env.AMOCRM_CLIENT_ID?.trim() ?? '';
@@ -178,7 +244,6 @@ function getAmoConfig() {
     Boolean(clientId) &&
     Boolean(clientSecret) &&
     Boolean(redirectUri) &&
-    Boolean(refreshToken) &&
     pipelineId !== null &&
     statusId !== null;
 
@@ -195,6 +260,14 @@ function getAmoConfig() {
   };
 }
 
+function getAmoBaseUrlFromTokenResponse(json: AmoAccessTokenResponse, fallback: string) {
+  if (isNonEmptyString(json.base_domain)) {
+    return `https://${json.base_domain.trim().replace(/^https?:\/\//, '')}`;
+  }
+
+  return fallback;
+}
+
 async function getAmoAccessToken() {
   const config = getAmoConfig();
 
@@ -202,7 +275,28 @@ async function getAmoAccessToken() {
     throw new Error('amoCRM не настроен.');
   }
 
-  const response = await fetch(`${config.baseUrl}/oauth2/access_token`, {
+  const tokenStorage = await readAmoTokenStorage();
+  const now = Date.now();
+
+  if (
+    isNonEmptyString(tokenStorage.access_token) &&
+    typeof tokenStorage.expires_at === 'number' &&
+    tokenStorage.expires_at - now > AMO_TOKEN_REFRESH_SKEW_MS
+  ) {
+    return {
+      accessToken: tokenStorage.access_token,
+      baseUrl: tokenStorage.base_url || config.baseUrl,
+    };
+  }
+
+  const refreshToken = tokenStorage.refresh_token || config.refreshToken;
+
+  if (!isNonEmptyString(refreshToken)) {
+    throw new Error('amoCRM refresh token не найден в storage или env.');
+  }
+
+  const baseUrl = tokenStorage.base_url || config.baseUrl;
+  const response = await fetch(`${baseUrl}/oauth2/access_token`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -212,15 +306,14 @@ async function getAmoAccessToken() {
       client_id: config.clientId,
       client_secret: config.clientSecret,
       grant_type: 'refresh_token',
-      refresh_token: config.refreshToken,
+      refresh_token: refreshToken,
       redirect_uri: config.redirectUri,
     }),
   });
 
   if (!response.ok) {
-    const details = await response.text().catch(() => '');
     throw new Error(
-      `Не удалось обновить access token amoCRM. ${details || `HTTP ${response.status}`}`,
+      `Не удалось обновить access token amoCRM. HTTP ${response.status}`,
     );
   }
 
@@ -230,7 +323,27 @@ async function getAmoAccessToken() {
     throw new Error('amoCRM вернул пустой access token.');
   }
 
-  return json.access_token;
+  const updatedBaseUrl = getAmoBaseUrlFromTokenResponse(json, baseUrl);
+  const expiresInSeconds =
+    typeof json.expires_in === 'number' && Number.isFinite(json.expires_in)
+      ? json.expires_in
+      : 24 * 60 * 60;
+  const updatedTokenStorage: AmoTokenStorage = {
+    access_token: json.access_token.trim(),
+    refresh_token: isNonEmptyString(json.refresh_token)
+      ? json.refresh_token.trim()
+      : refreshToken,
+    expires_at: now + expiresInSeconds * 1000,
+    base_url: updatedBaseUrl,
+    updated_at: new Date(now).toISOString(),
+  };
+
+  await writeAmoTokenStorage(updatedTokenStorage);
+
+  return {
+    accessToken: updatedTokenStorage.access_token,
+    baseUrl: updatedBaseUrl,
+  };
 }
 
 async function createAmoLead(payload: LeadRequestPayload) {
@@ -240,7 +353,7 @@ async function createAmoLead(payload: LeadRequestPayload) {
     throw new Error('amoCRM не настроен.');
   }
 
-  const accessToken = await getAmoAccessToken();
+  const { accessToken, baseUrl } = await getAmoAccessToken();
   const fieldIds = parseAmoFieldIds();
 
   const leadPayload = [
@@ -276,7 +389,7 @@ async function createAmoLead(payload: LeadRequestPayload) {
     },
   ];
 
-  const response = await fetch(`${config.baseUrl}/api/v4/leads/complex`, {
+  const response = await fetch(`${baseUrl}/api/v4/leads/complex`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -302,7 +415,7 @@ async function createAmoLead(payload: LeadRequestPayload) {
   const leadId = json._embedded?.leads?.[0]?.id;
 
   await addAmoLeadNote({
-    baseUrl: config.baseUrl,
+    baseUrl,
     accessToken,
     leadId,
     noteText: buildComment(payload),
