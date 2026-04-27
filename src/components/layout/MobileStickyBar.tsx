@@ -22,7 +22,7 @@ export function MobileStickyBar() {
         </a>
 
         <Link
-          href="/kontakty/"
+          href="/kontakty/#lead-form"
           className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--brand-red)] px-3 text-sm font-semibold text-white transition hover:opacity-90"
         >
           Фото
