@@ -41,6 +41,7 @@ export function CasePageTemplate({
           'Разбор по схеме: проблема → решение → результат',
           'Подход по состоянию объекта, без лишнего объёма работ',
         ]}
+        leadHref="/kontakty/#lead-form"
       />
 
       <SectionShell
