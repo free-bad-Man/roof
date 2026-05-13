@@ -5,7 +5,7 @@ export function PriceTableSection() {
   return (
     <Section
       title="Ориентиры по стоимости"
-      description="Ниже — входящие цены для первичного понимания бюджета. Это не окончательная смета, а стартовые ориентиры."
+      description="Ниже — ориентировочные цены для первичного понимания бюджета. Это не окончательная смета, а стартовые ориентиры."
     >
       <div className="overflow-hidden rounded-[28px] border border-black/10 bg-white">
         {priceRows.map(([label, value]) => (
