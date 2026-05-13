@@ -209,13 +209,13 @@ export const sectionPages = {
         price: 'от 350 ₽/м²',
       },
       {
-        href: '/natyazhnye-potolki/v-kvartiru/',
+        href: '/natyazhnye-potolki/pod-klyuch/',
         title: 'Натяжные потолки в квартиру',
         excerpt:
           'Решение для квартир с быстрым циклом работ и понятной организацией процесса.',
       },
       {
-        href: '/natyazhnye-potolki/v-chastnyy-dom/',
+        href: '/natyazhnye-potolki/pod-klyuch/',
         title: 'Натяжные потолки в частный дом',
         excerpt:
           'Потолки для частных домов с учётом площади, конфигурации и формата помещений.',
