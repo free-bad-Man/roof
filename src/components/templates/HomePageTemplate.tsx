@@ -150,7 +150,7 @@ export function HomePageTemplate({
 
       <ServicesGrid
         title="Ключевые услуги компании"
-        subtitle="Сначала считывается кровля как основной профиль. Гидроизоляция — входной продукт. Потолки остаются дополнительным направлением и не размывают ядро бренда."
+        subtitle="Основной профиль компании — кровельные работы. Также выполняем гидроизоляцию и натяжные потолки, когда это связано с задачей клиента и объектом."
         items={services.slice(0, 8).map((item) => ({
           href: item.href,
           title: item.title,
@@ -261,7 +261,7 @@ export function HomePageTemplate({
 
       <GlassSection className="pb-14">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <SectionTitle eyebrow="Контент-поддержка" title="Статьи и разборы" />
+          <SectionTitle eyebrow="Полезные статьи" title="Статьи и разборы" />
           <a href="/stati/" className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/25 bg-white/55 px-4 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white/75">
             Все статьи
           </a>

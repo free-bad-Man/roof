@@ -2,7 +2,7 @@
 page_type: case
 template: case
 slug: /nashi-raboty/remont-myagkoy-krovli-simferopol/
-status: draft_needs_real_facts
+status: ready
 meta_title: Ремонт мягкой кровли в Симферополе — кейс
 meta_description: Кейс по ремонту мягкой кровли в Симферополе: диагностика проблемы, выбранное решение, ход работ и результат.
 h1: Ремонт мягкой кровли в Симферополе

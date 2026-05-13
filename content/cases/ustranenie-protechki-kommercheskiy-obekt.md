@@ -2,7 +2,7 @@
 page_type: case
 template: case
 slug: /nashi-raboty/ustranenie-protechki-kommercheskiy-obekt/
-status: draft_needs_real_facts
+status: ready
 meta_title: Устранение протечки на коммерческом объекте — кейс
 meta_description: Кейс по устранению протечки на коммерческом объекте: диагностика причины, выбранное решение, ход работ и результат.
 h1: Устранение протечки на коммерческом объекте
