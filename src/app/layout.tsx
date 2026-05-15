@@ -20,6 +20,11 @@ const montserrat = Montserrat({
 export const metadata: Metadata = {
   title: 'Крымская Кровельная',
   description: 'Ремонт, восстановление и гидроизоляция кровли в Крыму',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 };
 
 export default function RootLayout({
