@@ -1,4 +1,5 @@
 import { LeadForm } from '@/components/forms/LeadForm';
+import { PhotoLeadForm } from '@/components/forms/PhotoLeadForm';
 import { PageHero } from '@/components/ui/PageHero';
 import { PhotoCta } from '@/components/ui/PhotoCta';
 import { SectionShell } from '@/components/ui/SectionShell';
@@ -97,6 +98,7 @@ export function ContactsPageTemplate() {
           variant="inspection"
         />
       </SectionShell>
+      <PhotoLeadForm />
 
       <PhotoCta
         title="Хотите быстрее получить предварительное решение?"
