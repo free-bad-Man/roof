@@ -44,6 +44,74 @@ type AmoLeadResponseItem = {
 const AMO_TOKEN_REFRESH_SKEW_MS = 5 * 60 * 1000;
 const DEFAULT_AMO_TOKEN_STORAGE_PATH = '.runtime/amocrm-tokens.json';
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null;
+}
+
+function getNumericAmoId(value: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isFinite(value)) {
+    return value;
+  }
+
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number.parseInt(value, 10);
+
+    if (Number.isFinite(parsed)) {
+      return parsed;
+    }
+  }
+
+  return undefined;
+}
+
+function getAmoLeadIdFromResponse(json: unknown): number | undefined {
+  if (Array.isArray(json)) {
+    for (const item of json) {
+      const id = getAmoLeadIdFromResponse(item);
+
+      if (id) {
+        return id;
+      }
+    }
+
+    return undefined;
+  }
+
+  if (!isRecord(json)) {
+    return undefined;
+  }
+
+  const directId = getNumericAmoId(json.id);
+
+  if (directId) {
+    return directId;
+  }
+
+  const embedded = json._embedded;
+
+  if (isRecord(embedded)) {
+    const leads = embedded.leads;
+
+    if (Array.isArray(leads)) {
+      for (const lead of leads) {
+        const id = getAmoLeadIdFromResponse(lead);
+
+        if (id) {
+          return id;
+        }
+      }
+    }
+  }
+
+  const lead = json.lead;
+
+  if (lead) {
+    return getAmoLeadIdFromResponse(lead);
+  }
+
+  return undefined;
+}
+
 function jsonResponse(
   body: LeadResponsePayload,
   status = 200,
@@ -412,13 +480,8 @@ async function createAmoLead(payload: LeadRequestPayload) {
     );
   }
 
-  const json = (await response.json()) as {
-    _embedded?: {
-      leads?: AmoLeadResponseItem[];
-    };
-  };
-
-  const leadId = json._embedded?.leads?.[0]?.id;
+  const json = (await response.json()) as unknown;
+  const leadId = getAmoLeadIdFromResponse(json);
 
   await addAmoLeadNote({
     baseUrl,
@@ -439,10 +502,11 @@ async function addAmoLeadNote(params: {
   noteText: string;
 }) {
   if (!params.leadId) {
+    console.error('[amoCRM lead note] skipped: leadId was not found in leads/complex response.');
     return;
   }
 
-  await fetch(`${params.baseUrl}/api/v4/leads/${params.leadId}/notes`, {
+  const response = await fetch(`${params.baseUrl}/api/v4/leads/${params.leadId}/notes`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -457,9 +521,22 @@ async function addAmoLeadNote(params: {
         },
       },
     ]),
-  }).catch(() => {
-    // Нота не должна ломать приём лида.
+  }).catch((error) => {
+    console.error('[amoCRM lead note] request failed.', error);
+    return null;
   });
+
+  if (!response) {
+    return;
+  }
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => '');
+    console.error(
+      `[amoCRM lead note] failed. HTTP ${response.status}`,
+      details,
+    );
+  }
 }
 
 function getWebhookConfig() {
