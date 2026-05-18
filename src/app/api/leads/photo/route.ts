@@ -44,6 +44,8 @@ type UploadedAmoFile = {
   name: string;
   size: number;
   type?: string;
+  downloadUrl?: string;
+  previewUrl?: string;
 };
 
 const AMO_TOKEN_REFRESH_SKEW_MS = 5 * 60 * 1000;
@@ -335,6 +337,40 @@ function formatFileSize(size: number) {
   return `${Math.max(1, Math.round(size / 1024))} КБ`;
 }
 
+function getAmoFileDownloadUrl(file: UploadedAmoFile) {
+  return file.downloadUrl || file.previewUrl || '';
+}
+
+function getNestedString(value: unknown, path: string[]) {
+  let current: unknown = value;
+
+  for (const key of path) {
+    if (!isRecord(current)) {
+      return '';
+    }
+
+    current = current[key];
+  }
+
+  return isNonEmptyString(current) ? current.trim() : '';
+}
+
+function getFirstPreviewUrl(value: unknown) {
+  if (!isRecord(value) || !Array.isArray(value.previews)) {
+    return '';
+  }
+
+  for (const preview of value.previews) {
+    const downloadLink = getNestedString(preview, ['download_link']);
+
+    if (downloadLink) {
+      return downloadLink;
+    }
+  }
+
+  return '';
+}
+
 function buildPhotoLeadComment(data: PhotoLeadData, files: File[], uploadedFiles: UploadedAmoFile[]) {
   const lines = [
     `Форма: ${data.formName}`,
@@ -354,7 +390,13 @@ function buildPhotoLeadComment(data: PhotoLeadData, files: File[], uploadedFiles
     lines.push('Прикреплённые файлы:');
 
     for (const file of uploadedFiles) {
-      lines.push(`— ${file.name} (${formatFileSize(file.size)})`);
+      const fileUrl = getAmoFileDownloadUrl(file);
+
+      lines.push(
+        fileUrl
+          ? `— ${file.name} (${formatFileSize(file.size)}): ${fileUrl}`
+          : `— ${file.name} (${formatFileSize(file.size)})`,
+      );
     }
   }
 
@@ -585,6 +627,8 @@ async function uploadFileToAmoDrive(params: {
     name: fileName,
     size: bytes.length,
     type: isNonEmptyString(uploadedJson.type) ? uploadedJson.type : undefined,
+    downloadUrl: getNestedString(uploadedJson, ['_links', 'download', 'href']),
+    previewUrl: getFirstPreviewUrl(uploadedJson),
   };
 }
 
