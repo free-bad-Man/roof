@@ -358,6 +358,7 @@ async function createAmoLead(payload: LeadRequestPayload) {
 
   const { accessToken, baseUrl } = await getAmoAccessToken();
   const fieldIds = parseAmoFieldIds();
+  const customFieldsValues = buildLeadCustomFields(payload, fieldIds);
 
   const leadPayload = [
     {
@@ -367,7 +368,9 @@ async function createAmoLead(payload: LeadRequestPayload) {
       ...(config.responsibleUserId
         ? { responsible_user_id: config.responsibleUserId }
         : {}),
-      custom_fields_values: buildLeadCustomFields(payload, fieldIds),
+      ...(customFieldsValues.length > 0
+        ? { custom_fields_values: customFieldsValues }
+        : {}),
       _embedded: {
         contacts: [
           {
