@@ -50,7 +50,7 @@ export function ServicesGrid({ title, subtitle, items }: ServicesGridProps) {
                 Подробнее
               </Link>
               <Link
-                href="/kontakty/"
+                href="/kontakty/#photo-lead-form"
                 className="inline-flex min-h-11 items-center justify-center rounded-xl border border-neutral-300 px-4 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-50"
               >
                 Отправить фото

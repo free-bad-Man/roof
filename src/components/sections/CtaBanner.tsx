@@ -15,7 +15,7 @@ export function CtaBanner({ title, text }: { title: string; text: string }) {
           </p>
 
           <div className="mt-6 flex flex-col gap-3 sm:flex-row">
-            <Button href={company.telegramHref}>Отправить фото объекта</Button>
+            <Button href="/kontakty/#photo-lead-form">Отправить фото объекта</Button>
             <Button href="/kontakty/#lead-form" variant="secondary">
               Получить расчёт
             </Button>

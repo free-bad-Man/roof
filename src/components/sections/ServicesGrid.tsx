@@ -66,7 +66,7 @@ export function ServicesGrid({
                 </Link>
 
                 <Link
-                  href="/kontakty/"
+                  href="/kontakty/#photo-lead-form"
                   className="inline-flex min-h-11 items-center justify-center rounded-xl border border-white/24 bg-white/68 px-5 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white/82"
                 >
                   Отправить фото

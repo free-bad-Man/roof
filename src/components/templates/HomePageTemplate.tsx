@@ -119,9 +119,7 @@ export function HomePageTemplate({
 
           <div className="mt-6 grid gap-3 sm:grid-cols-[max-content_max-content] sm:items-center sm:justify-between">
             <a
-              href={company.telegramHref}
-              target="_blank"
-              rel="noreferrer"
+              href="/kontakty/#photo-lead-form"
               className="inline-flex min-h-12 min-w-[228px] items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700"
             >
               Отправить фото объекта

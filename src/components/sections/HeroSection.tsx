@@ -31,7 +31,7 @@ export function HeroSection() {
           </ul>
 
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-            <Button href={company.telegramHref}>Отправить фото объекта</Button>
+            <Button href="/kontakty/#photo-lead-form">Отправить фото объекта</Button>
             <Button href="#lead-form" variant="secondary">
               Получить расчёт
             </Button>
