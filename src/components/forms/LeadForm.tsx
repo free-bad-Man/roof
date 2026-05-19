@@ -104,6 +104,8 @@ export function LeadForm({
     'idle',
   );
   const [errorMessage, setErrorMessage] = useState('');
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
 
   const formName = VARIANT_FORM_NAME[variant];
   const resolvedSubmitLabel = submitLabel || VARIANT_SUBMIT_LABEL[variant];
@@ -161,6 +163,85 @@ export function LeadForm({
         [field]: event.target.value,
       }));
     };
+  const handlePhotoFilesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextFiles = Array.from(event.target.files || []).slice(0, 6);
+
+    setPhotoFiles(nextFiles);
+    setStatus('idle');
+    setErrorMessage('');
+  };
+
+  const handlePhotoSubmit = async () => {
+    const baseComment = form.message.trim();
+    const comment = [baseComment, 'Нужен выезд: да / по ситуации.']
+      .filter(Boolean)
+      .join('\n\n');
+    const city = isMain ? '' : form.city.trim();
+
+    if (!form.name.trim() || !form.phone.trim() || !city || !resolvedService || !baseComment) {
+      setStatus('error');
+      setErrorMessage('Заполните имя, телефон, город, услугу и описание задачи.');
+      return;
+    }
+
+    if (photoFiles.length === 0) {
+      setStatus('error');
+      setErrorMessage('Прикрепите хотя бы одно фото объекта.');
+      return;
+    }
+
+    setStatus('pending');
+    setErrorMessage('');
+
+    const payload = new FormData();
+    payload.set('source', 'Сайт');
+    payload.set('formName', 'Сайт — Фото объекта');
+    payload.set('pagePath', pathname);
+    payload.set('name', form.name.trim());
+    payload.set('phone', form.phone.trim());
+    payload.set('city', city);
+    payload.set('service', resolvedService);
+    payload.set('comment', comment);
+
+    for (const file of photoFiles) {
+      payload.append('photos', file);
+    }
+
+    try {
+      const response = await fetch('/api/leads/photo/', {
+        method: 'POST',
+        body: payload,
+      });
+
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.message || 'Не удалось отправить фото.');
+      }
+
+      setStatus('success');
+      setForm({
+        name: '',
+        phone: '',
+        service: '',
+        city: '',
+        message: '',
+      });
+      setPhotoFiles([]);
+      setPhotoInputKey((prev) => prev + 1);
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Не удалось отправить фото. Попробуйте ещё раз.',
+      );
+    }
+  };
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -380,14 +461,50 @@ export function LeadForm({
                   required
                 />
               </div>
+              {isInspection ? (
+                <div>
+                  <label
+                    htmlFor={`${variant}-photos`}
+                    className="mb-2 block text-sm font-semibold text-[var(--brand-graphite)]/78"
+                  >
+                    Фото объекта
+                  </label>
+                  <input
+                    key={photoInputKey}
+                    id={`${variant}-photos`}
+                    name="photos"
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handlePhotoFilesChange}
+                    className="w-full rounded-[16px] border border-white/25 bg-white/70 px-4 py-3 text-[15px] text-[var(--brand-graphite)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700 focus:border-red-300 focus:bg-white"
+                  />
+                  <p className="mt-2 text-sm leading-6 text-[var(--brand-muted)]">
+                    {photoFiles.length > 0
+                      ? `${photoFiles.length} файл(ов) выбрано. До 6 фото, до 8 МБ каждое.`
+                      : 'Можно прикрепить 1–6 фото объекта.'}
+                  </p>
+                </div>
+              ) : null}
+
 
               <button
                 type="submit"
                 disabled={status === 'pending'}
                 className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {status === 'pending' ? 'Отправляем...' : resolvedSubmitLabel}
-              </button>
+                {status === 'pending' ? 'Отправляем...' : resolvedSubmitLabel}</button>
+
+              {isInspection ? (
+                <button
+                  type="button"
+                  onClick={handlePhotoSubmit}
+                  disabled={status === 'pending'}
+                  className="-mt-1 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-white/75 px-6 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {status === 'pending' ? 'Отправляем...' : 'Отправить фото'}
+                </button>
+              ) : null}
 
               <div className="space-y-2">
                 {status === 'success' ? (
