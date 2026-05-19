@@ -14,6 +14,7 @@ type AmoFieldIds = Partial<
     | 'source'
     | 'service'
     | 'city'
+    | 'comment'
     | 'formName'
     | 'pagePath'
     | 'pageTitle'
@@ -206,6 +207,24 @@ function buildComment(payload: LeadRequestPayload) {
   return lines.join('\n');
 }
 
+function normalizeAmoServiceValue(value: string | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const serviceMap: Record<string, string> = {
+    'Восстановление мягкой кровли / Sinzatim': 'Мягкая кровля / Sinzatim',
+    'Гидроизоляция балконов и террас': 'Балкон / терраса',
+    'Локальный ремонт / герметизация': 'Герметизация узлов',
+    'Устранение протечек': 'Устранение протечки',
+    'Натяжные потолки под ключ': 'Натяжные потолки',
+  };
+
+  return serviceMap[trimmed] || trimmed;
+}
+
 function buildLeadCustomFields(
   payload: LeadRequestPayload,
   fieldIds: AmoFieldIds,
@@ -227,8 +246,9 @@ function buildLeadCustomFields(
   };
 
   pushField(fieldIds.source, payload.source);
-  pushField(fieldIds.service, payload.deal.service);
+  pushField(fieldIds.service, normalizeAmoServiceValue(payload.deal.service));
   pushField(fieldIds.city, payload.deal.city);
+  pushField(fieldIds.comment, payload.deal.comment);
   pushField(fieldIds.formName, payload.formName);
   pushField(fieldIds.pagePath, payload.pagePath);
   pushField(fieldIds.pageTitle, payload.pageTitle);

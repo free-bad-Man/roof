@@ -13,6 +13,18 @@ type PhotoLeadResponsePayload = {
   attachedFiles?: number;
 };
 
+type AmoFieldIds = Partial<
+  Record<
+    | 'source'
+    | 'service'
+    | 'city'
+    | 'comment'
+    | 'formName'
+    | 'pagePath',
+    number
+  >
+>;
+
 type AmoAccessTokenResponse = {
   access_token: string;
   refresh_token?: string;
@@ -81,6 +93,37 @@ function isNonEmptyString(value: unknown): value is string {
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null;
+}
+
+function parseAmoFieldIds(): AmoFieldIds {
+  const raw = process.env.AMOCRM_FIELD_IDS_JSON;
+
+  if (!raw) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Record<string, unknown>;
+    const result: AmoFieldIds = {};
+
+    for (const [key, value] of Object.entries(parsed)) {
+      if (typeof value === 'number' && Number.isFinite(value)) {
+        result[key as keyof AmoFieldIds] = value;
+      }
+
+      if (typeof value === 'string' && value.trim()) {
+        const numeric = Number.parseInt(value, 10);
+
+        if (Number.isFinite(numeric)) {
+          result[key as keyof AmoFieldIds] = numeric;
+        }
+      }
+    }
+
+    return result;
+  } catch {
+    return {};
+  }
 }
 
 function parseIntegerEnv(name: string): number | null {
@@ -329,6 +372,50 @@ async function getAmoAccessToken(options: { forceRefresh?: boolean } = {}) {
   };
 }
 
+function normalizeAmoServiceValue(value: string | undefined) {
+  const trimmed = value?.trim();
+
+  if (!trimmed) {
+    return undefined;
+  }
+
+  const serviceMap: Record<string, string> = {
+    'Восстановление мягкой кровли / Sinzatim': 'Мягкая кровля / Sinzatim',
+    'Гидроизоляция балконов и террас': 'Балкон / терраса',
+    'Локальный ремонт / герметизация': 'Герметизация узлов',
+    'Устранение протечек': 'Устранение протечки',
+    'Натяжные потолки под ключ': 'Натяжные потолки',
+  };
+
+  return serviceMap[trimmed] || trimmed;
+}
+function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) {
+  const items: Array<{
+    field_id: number;
+    values: Array<{ value: string }>;
+  }> = [];
+
+  const pushField = (fieldId: number | undefined, value: string | undefined) => {
+    if (!fieldId || !isNonEmptyString(value)) {
+      return;
+    }
+
+    items.push({
+      field_id: fieldId,
+      values: [{ value: value.trim() }],
+    });
+  };
+
+  pushField(fieldIds.source, data.source);
+  pushField(fieldIds.service, normalizeAmoServiceValue(data.service));
+  pushField(fieldIds.city, data.city);
+  pushField(fieldIds.comment, data.comment);
+  pushField(fieldIds.formName, data.formName);
+  pushField(fieldIds.pagePath, data.pagePath);
+
+  return items;
+}
+
 function buildPhotoLeadName(data: PhotoLeadData) {
   const parts = [
     'Фото объекта',
@@ -407,6 +494,8 @@ async function createAmoPhotoLead(data: PhotoLeadData) {
   }
 
   const { accessToken, baseUrl } = await getAmoAccessToken();
+  const fieldIds = parseAmoFieldIds();
+  const customFieldsValues = buildPhotoLeadCustomFields(data, fieldIds);
 
   const leadPayload = [
     {
@@ -415,6 +504,9 @@ async function createAmoPhotoLead(data: PhotoLeadData) {
       status_id: config.statusId,
       ...(config.responsibleUserId
         ? { responsible_user_id: config.responsibleUserId }
+        : {}),
+      ...(customFieldsValues.length > 0
+        ? { custom_fields_values: customFieldsValues }
         : {}),
       _embedded: {
         contacts: [
