@@ -385,22 +385,6 @@ function buildPhotoLeadComment(data: PhotoLeadData, files: File[], uploadedFiles
     '',
     `Фото прикреплено к сделке: ${uploadedFiles.length} из ${files.length}`,
   ].filter(Boolean);
-
-  if (uploadedFiles.length > 0) {
-    lines.push('');
-    lines.push('Прикреплённые файлы:');
-
-    for (const file of uploadedFiles) {
-      const fileUrl = getAmoFileDownloadUrl(file);
-
-      lines.push(
-        fileUrl
-          ? `— ${file.name} (${formatFileSize(file.size)}): ${fileUrl}`
-          : `— ${file.name} (${formatFileSize(file.size)})`,
-      );
-    }
-  }
-
   return lines.join('\n');
 }
 
