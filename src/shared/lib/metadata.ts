@@ -3,7 +3,7 @@ import { company } from '@/shared/data/site';
 import type { SeoEntry } from '@/shared/content';
 
 function normalizeSiteUrl(url?: string) {
-  return (url || 'https://example.com').replace(/\/$/, '');
+  return (url || 'https://krimskaya-krovelnaya.ru').replace(/\/$/, '');
 }
 
 export function getSiteUrl() {

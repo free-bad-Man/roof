@@ -1,24 +1,24 @@
-// src/app/robots.ts
-import type { MetadataRoute } from "next";
-
-const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL || "https://site.ru").replace(/\/$/, "");
+import type { MetadataRoute } from 'next';
+import { getSiteUrl } from '@/shared/lib/metadata';
 
 export default function robots(): MetadataRoute.Robots {
+  const siteUrl = getSiteUrl();
+
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
+        userAgent: '*',
+        allow: '/',
         disallow: [
-          "/api/",
-          "/thank-you/",
-          "/search/",
-          "/test/",
-          "/_next/",
+          '/api/',
+          '/thank-you/',
+          '/search/',
+          '/test/',
+          '/_next/',
         ],
       },
     ],
-    sitemap: `${SITE_URL}/sitemap.xml`,
-    host: SITE_URL,
+    sitemap: `${siteUrl}/sitemap.xml`,
+    host: siteUrl,
   };
 }
