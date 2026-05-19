@@ -4,6 +4,7 @@ import './globals.css';
 import { SiteHeader } from '@/components/layout/SiteHeader';
 import { SiteFooter } from '@/components/layout/SiteFooter';
 import { MobileStickyBar } from '@/components/layout/MobileStickyBar';
+import { GlobalJsonLd } from '@/components/seo/GlobalJsonLd';
 
 const manrope = Manrope({
   subsets: ['latin', 'cyrillic'],
