@@ -5,6 +5,7 @@ import { PageFaq } from '@/components/ui/PageFaq';
 import { PageHero } from '@/components/ui/PageHero';
 import { PhotoCta } from '@/components/ui/PhotoCta';
 import { SectionShell } from '@/components/ui/SectionShell';
+import { ServiceJsonLd } from '@/components/seo/ServiceJsonLd';
 import type { FaqItem, ServicePageData } from '@/shared/types/page';
 
 type ServiceSection =
@@ -87,6 +88,8 @@ export function ServicePageTemplate(props: ServicePageTemplateProps) {
 
   return (
     <>
+      <ServiceJsonLd data={data} />
+
       <PageHero
         eyebrow={getSectionEyebrow(data.section)}
         title={data.h1}
