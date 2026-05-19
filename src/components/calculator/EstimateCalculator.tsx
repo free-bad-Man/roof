@@ -596,15 +596,6 @@ export function EstimateCalculator() {
                   : 'Отправить расчёт менеджеру'}
             </button>
 
-            <button
-              type="button"
-              onClick={handlePhotoSubmit}
-              disabled={status === 'pending'}
-              className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-white/75 px-6 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {status === 'pending' ? 'Отправляем...' : 'Прикрепить фото'}
-            </button>
-
             {status === 'success' ? (
               <p className="mt-4 text-sm leading-6 text-emerald-700">
                 Спасибо. Расчёт отправлен менеджеру, скоро свяжемся с вами и уточним детали.

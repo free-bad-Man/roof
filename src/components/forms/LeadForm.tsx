@@ -504,17 +504,6 @@ export function LeadForm({
                     ? 'Отправить заявку с фото'
                     : resolvedSubmitLabel}</button>
 
-              {(isMain || isInspection) ? (
-                <button
-                  type="button"
-                  onClick={handlePhotoSubmit}
-                  disabled={status === 'pending'}
-                  className="-mt-1 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-white/75 px-6 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
-                >
-                  {status === 'pending' ? 'Отправляем...' : 'Прикрепить фото'}
-                </button>
-              ) : null}
-
               <div className="space-y-2">
                 {status === 'success' ? (
                   <p className="text-sm leading-6 text-emerald-700">
