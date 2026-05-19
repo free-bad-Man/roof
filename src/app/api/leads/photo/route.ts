@@ -44,6 +44,7 @@ type UploadedAmoFile = {
   name: string;
   size: number;
   type?: string;
+  versionUuid?: string;
   downloadUrl?: string;
   previewUrl?: string;
 };
@@ -627,9 +628,55 @@ async function uploadFileToAmoDrive(params: {
     name: fileName,
     size: bytes.length,
     type: isNonEmptyString(uploadedJson.type) ? uploadedJson.type : undefined,
+    versionUuid: getNestedString(uploadedJson, ['version_uuid']),
     downloadUrl: getNestedString(uploadedJson, ['_links', 'download', 'href']),
     previewUrl: getFirstPreviewUrl(uploadedJson),
   };
+}
+
+async function addAmoLeadAttachmentNotes(params: {
+  baseUrl: string;
+  accessToken: string;
+  leadId: number;
+  files: UploadedAmoFile[];
+}) {
+  if (params.files.length === 0) {
+    return;
+  }
+
+  const response = await fetch(`${params.baseUrl}/api/v4/leads/${params.leadId}/notes`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${params.accessToken}`,
+    },
+    cache: 'no-store',
+    body: JSON.stringify(
+      params.files.map((file) => ({
+        note_type: 'attachment',
+        params: {
+          file_uuid: file.uuid,
+          ...(file.versionUuid ? { version_uuid: file.versionUuid } : {}),
+          file_name: file.name,
+        },
+      })),
+    ),
+  }).catch((error) => {
+    console.error('[amoCRM photo attachment note] request failed.', error);
+    return null;
+  });
+
+  if (!response) {
+    return;
+  }
+
+  if (!response.ok) {
+    const details = await response.text().catch(() => '');
+    console.error(
+      `[amoCRM photo attachment note] failed. HTTP ${response.status}`,
+      details,
+    );
+  }
 }
 
 async function bindAmoFilesToLead(params: {
@@ -756,6 +803,13 @@ export async function POST(request: NextRequest) {
     }
 
     await bindAmoFilesToLead({
+      baseUrl: lead.baseUrl,
+      accessToken: lead.accessToken,
+      leadId: lead.leadId,
+      files: uploadedFiles,
+    });
+
+    await addAmoLeadAttachmentNotes({
       baseUrl: lead.baseUrl,
       accessToken: lead.accessToken,
       leadId: lead.leadId,
