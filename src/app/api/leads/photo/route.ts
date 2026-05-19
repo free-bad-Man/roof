@@ -238,7 +238,7 @@ function getAmoBaseUrlFromTokenResponse(json: AmoAccessTokenResponse, fallback: 
   return fallback;
 }
 
-async function getAmoAccessToken() {
+async function getAmoAccessToken(options: { forceRefresh?: boolean } = {}) {
   const config = getAmoConfig();
 
   if (!config.isConfigured) {
@@ -249,6 +249,7 @@ async function getAmoAccessToken() {
   const now = Date.now();
 
   if (
+    !options.forceRefresh &&
     isNonEmptyString(tokenStorage.access_token) &&
     typeof tokenStorage.expires_at === 'number' &&
     tokenStorage.expires_at - now > AMO_TOKEN_REFRESH_SKEW_MS
@@ -773,13 +774,17 @@ export async function POST(request: NextRequest) {
 
   try {
     const lead = await createAmoPhotoLead(data);
-    const driveUrl = await getAmoDriveUrl(lead.baseUrl, lead.accessToken);
+
+    // The amoCRM Files API is stricter about token freshness than regular CRM endpoints.
+    // Force-refresh before Drive calls to avoid stale-token 401 on /v1.0/sessions.
+    const fileAuth = await getAmoAccessToken({ forceRefresh: true });
+    const driveUrl = await getAmoDriveUrl(fileAuth.baseUrl, fileAuth.accessToken);
     const uploadedFiles: UploadedAmoFile[] = [];
 
     for (const file of files) {
       const uploaded = await uploadFileToAmoDrive({
         driveUrl,
-        accessToken: lead.accessToken,
+        accessToken: fileAuth.accessToken,
         file,
       });
 
@@ -787,22 +792,22 @@ export async function POST(request: NextRequest) {
     }
 
     await bindAmoFilesToLead({
-      baseUrl: lead.baseUrl,
-      accessToken: lead.accessToken,
+      baseUrl: fileAuth.baseUrl,
+      accessToken: fileAuth.accessToken,
       leadId: lead.leadId,
       files: uploadedFiles,
     });
 
     await addAmoLeadAttachmentNotes({
-      baseUrl: lead.baseUrl,
-      accessToken: lead.accessToken,
+      baseUrl: fileAuth.baseUrl,
+      accessToken: fileAuth.accessToken,
       leadId: lead.leadId,
       files: uploadedFiles,
     });
 
     await addAmoLeadNote({
-      baseUrl: lead.baseUrl,
-      accessToken: lead.accessToken,
+      baseUrl: fileAuth.baseUrl,
+      accessToken: fileAuth.accessToken,
       leadId: lead.leadId,
       noteText: buildPhotoLeadComment(data, files, uploadedFiles),
     });
