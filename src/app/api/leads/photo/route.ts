@@ -37,6 +37,7 @@ type PhotoLeadData = {
   city: string;
   service: string;
   comment: string;
+  utm: Record<string, string>;
 };
 
 type UploadedAmoFile = {
@@ -54,6 +55,14 @@ const DEFAULT_AMO_TOKEN_STORAGE_PATH = '.runtime/amocrm-tokens.json';
 const MAX_PHOTO_FILES = 6;
 const MAX_PHOTO_FILE_SIZE_BYTES = 8 * 1024 * 1024;
 const MAX_PHOTO_TOTAL_SIZE_BYTES = 32 * 1024 * 1024;
+const UTM_KEYS = [
+  'utm_source',
+  'utm_medium',
+  'utm_campaign',
+  'utm_content',
+  'utm_term',
+] as const;
+
 
 function jsonResponse(
   body: PhotoLeadResponsePayload,
@@ -386,6 +395,18 @@ function buildPhotoLeadComment(data: PhotoLeadData, files: File[], uploadedFiles
     '',
     `Фото прикреплено к сделке: ${uploadedFiles.length} из ${files.length}`,
   ].filter(Boolean);
+
+  if (Object.keys(data.utm).length > 0) {
+    lines.push('');
+    lines.push('UTM:');
+
+    for (const [key, value] of Object.entries(data.utm)) {
+      if (isNonEmptyString(value)) {
+        lines.push(`${key}: ${value.trim()}`);
+      }
+    }
+  }
+
   return lines.join('\n');
 }
 
@@ -701,6 +722,19 @@ function getText(formData: FormData, key: string) {
   return typeof value === 'string' ? value.trim() : '';
 }
 
+function getUtmFromFormData(formData: FormData) {
+  const utm: Record<string, string> = {};
+
+  for (const key of UTM_KEYS) {
+    const value = getText(formData, key);
+
+    if (value) {
+      utm[key] = value;
+    }
+  }
+
+  return utm;
+}
 function getPhotoFiles(formData: FormData) {
   return formData
     .getAll('photos')
@@ -763,6 +797,7 @@ export async function POST(request: NextRequest) {
     city: getText(formData, 'city'),
     service: getText(formData, 'service'),
     comment: getText(formData, 'comment'),
+    utm: getUtmFromFormData(formData),
   };
 
   const files = getPhotoFiles(formData);

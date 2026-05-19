@@ -2,6 +2,7 @@
 
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
+import { appendUtmToFormData } from '@/shared/lib/utm';
 
 type PhotoLeadState = {
   name: string;
@@ -111,6 +112,7 @@ export function PhotoLeadForm() {
     payload.set('city', form.city.trim());
     payload.set('service', form.service.trim());
     payload.set('comment', form.comment.trim());
+    appendUtmToFormData(payload);
 
     for (const file of files) {
       payload.append('photos', file);

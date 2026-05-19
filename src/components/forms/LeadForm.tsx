@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { LeadRequestPayload } from '@/shared/types/lead';
+import { appendUtmToFormData, getUtmParams } from '@/shared/lib/utm';
 
 type LeadFormVariant = 'main' | 'service' | 'inspection';
 
@@ -202,6 +203,7 @@ export function LeadForm({
     payload.set('city', city);
     payload.set('service', resolvedService);
     payload.set('comment', comment);
+    appendUtmToFormData(payload);
 
     for (const file of photoFiles) {
       payload.append('photos', file);
@@ -264,6 +266,7 @@ export function LeadForm({
       source: 'Сайт',
       formName,
       pagePath: pathname,
+      utm: getUtmParams(),
       client: {
         name: form.name.trim(),
         phone: form.phone.trim(),

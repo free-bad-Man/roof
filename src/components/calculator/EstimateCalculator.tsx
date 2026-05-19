@@ -3,6 +3,7 @@
 import { ChangeEvent, FormEvent, useMemo, useState } from 'react';
 import { usePathname } from 'next/navigation';
 import type { LeadRequestPayload } from '@/shared/types/lead';
+import { appendUtmToFormData, getUtmParams } from '@/shared/lib/utm';
 
 type Direction = 'Кровля' | 'Гидроизоляция' | 'Натяжные потолки';
 type PricingMode = 'area' | 'fixed' | 'inspection';
@@ -284,6 +285,7 @@ export function EstimateCalculator() {
     payload.set('city', form.city.trim());
     payload.set('service', form.service.trim());
     payload.set('comment', buildPhotoCommentParts().join('\n'));
+    appendUtmToFormData(payload);
 
     for (const file of photoFiles) {
       payload.append('photos', file);
@@ -360,6 +362,7 @@ export function EstimateCalculator() {
       source: 'Сайт',
       formName: 'Сайт — Калькулятор',
       pagePath: pathname,
+      utm: getUtmParams(),
       client: {
         name: form.name.trim(),
         phone: form.phone.trim(),
