@@ -36,6 +36,7 @@ export default function RootLayout({
   return (
     <html lang="ru">
       <body className={`${manrope.variable} ${montserrat.variable}`}>
+        <GlobalJsonLd />
         <div
           aria-hidden="true"
           className="pointer-events-none fixed inset-0 z-0 bg-[url('/brand/logo/background-logo_2.png')] bg-cover bg-center bg-no-repeat"
