@@ -798,18 +798,18 @@ export async function POST(request: NextRequest) {
       files: uploadedFiles,
     });
 
-    await addAmoLeadAttachmentNotes({
-      baseUrl: fileAuth.baseUrl,
-      accessToken: fileAuth.accessToken,
-      leadId: lead.leadId,
-      files: uploadedFiles,
-    });
-
     await addAmoLeadNote({
       baseUrl: fileAuth.baseUrl,
       accessToken: fileAuth.accessToken,
       leadId: lead.leadId,
       noteText: buildPhotoLeadComment(data, files, uploadedFiles),
+    });
+
+    await addAmoLeadAttachmentNotes({
+      baseUrl: fileAuth.baseUrl,
+      accessToken: fileAuth.accessToken,
+      leadId: lead.leadId,
+      files: uploadedFiles,
     });
 
     return jsonResponse({
