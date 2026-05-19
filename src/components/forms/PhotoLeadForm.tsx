@@ -112,6 +112,7 @@ export function PhotoLeadForm() {
     payload.set('city', form.city.trim());
     payload.set('service', form.service.trim());
     payload.set('comment', form.comment.trim());
+    payload.set('needVisit', 'Да');
     appendUtmToFormData(payload);
 
     for (const file of files) {

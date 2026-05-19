@@ -19,6 +19,9 @@ type AmoFieldIds = Partial<
     | 'service'
     | 'city'
     | 'comment'
+    | 'objectType'
+    | 'needVisit'
+    | 'estimateSum'
     | 'formName'
     | 'pagePath',
     number
@@ -49,6 +52,9 @@ type PhotoLeadData = {
   city: string;
   service: string;
   comment: string;
+  objectType: string;
+  needVisit: string;
+  estimateSum: string;
   utm: Record<string, string>;
 };
 
@@ -392,7 +398,7 @@ function normalizeAmoServiceValue(value: string | undefined) {
 function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) {
   const items: Array<{
     field_id: number;
-    values: Array<{ value: string }>;
+    values: Array<{ value: string | number }>;
   }> = [];
 
   const pushField = (fieldId: number | undefined, value: string | undefined) => {
@@ -406,10 +412,30 @@ function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) 
     });
   };
 
+
+  const pushNumericField = (fieldId: number | undefined, value: string | undefined) => {
+    if (!fieldId || !isNonEmptyString(value)) {
+      return;
+    }
+
+    const numeric = Number.parseFloat(value.replace(/\s+/g, '').replace(',', '.'));
+
+    if (!Number.isFinite(numeric)) {
+      return;
+    }
+
+    items.push({
+      field_id: fieldId,
+      values: [{ value: numeric }],
+    });
+  };
   pushField(fieldIds.source, data.source);
   pushField(fieldIds.service, normalizeAmoServiceValue(data.service));
   pushField(fieldIds.city, data.city);
   pushField(fieldIds.comment, data.comment);
+  pushField(fieldIds.objectType, data.objectType);
+  pushField(fieldIds.needVisit, data.needVisit);
+  pushNumericField(fieldIds.estimateSum, data.estimateSum);
   pushField(fieldIds.formName, data.formName);
   pushField(fieldIds.pagePath, data.pagePath);
 
@@ -878,6 +904,9 @@ export async function POST(request: NextRequest) {
     city: getText(formData, 'city'),
     service: getText(formData, 'service'),
     comment: getText(formData, 'comment'),
+    objectType: getText(formData, 'objectType'),
+    needVisit: getText(formData, 'needVisit') || 'Да',
+    estimateSum: getText(formData, 'estimateSum'),
     utm: getUtmFromFormData(formData),
   };
 

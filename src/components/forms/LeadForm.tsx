@@ -203,6 +203,7 @@ export function LeadForm({
     payload.set('city', city);
     payload.set('service', resolvedService);
     payload.set('comment', comment);
+    payload.set('needVisit', 'Да');
     appendUtmToFormData(payload);
 
     for (const file of photoFiles) {
@@ -275,6 +276,7 @@ export function LeadForm({
         ...(resolvedService ? { service: resolvedService } : {}),
         ...(city ? { city } : {}),
         comment,
+        ...(isInspection ? { needVisit: 'Да' } : {}),
       },
     };
 

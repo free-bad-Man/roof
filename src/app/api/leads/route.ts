@@ -15,6 +15,9 @@ type AmoFieldIds = Partial<
     | 'service'
     | 'city'
     | 'comment'
+    | 'objectType'
+    | 'needVisit'
+    | 'estimateSum'
     | 'formName'
     | 'pagePath'
     | 'pageTitle'
@@ -231,7 +234,7 @@ function buildLeadCustomFields(
 ) {
   const items: Array<{
     field_id: number;
-    values: Array<{ value: string }>;
+    values: Array<{ value: string | number }>;
   }> = [];
 
   const pushField = (fieldId: number | undefined, value: string | undefined) => {
@@ -245,10 +248,30 @@ function buildLeadCustomFields(
     });
   };
 
+
+  const pushNumericField = (fieldId: number | undefined, value: string | undefined) => {
+    if (!fieldId || !isNonEmptyString(value)) {
+      return;
+    }
+
+    const numeric = Number.parseFloat(value.replace(/\s+/g, '').replace(',', '.'));
+
+    if (!Number.isFinite(numeric)) {
+      return;
+    }
+
+    items.push({
+      field_id: fieldId,
+      values: [{ value: numeric }],
+    });
+  };
   pushField(fieldIds.source, payload.source);
   pushField(fieldIds.service, normalizeAmoServiceValue(payload.deal.service));
   pushField(fieldIds.city, payload.deal.city);
   pushField(fieldIds.comment, payload.deal.comment);
+  pushField(fieldIds.objectType, payload.deal.objectType);
+  pushField(fieldIds.needVisit, payload.deal.needVisit);
+  pushNumericField(fieldIds.estimateSum, payload.deal.estimateSum);
   pushField(fieldIds.formName, payload.formName);
   pushField(fieldIds.pagePath, payload.pagePath);
   pushField(fieldIds.pageTitle, payload.pageTitle);

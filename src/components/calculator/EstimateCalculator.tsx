@@ -190,6 +190,22 @@ export function EstimateCalculator() {
   const areaValue = Number(form.area.replace(',', '.')) || 0;
   const shouldShowArea = selectedService?.mode === 'area';
   const calculationLabel = buildCalculationLabel(selectedService, areaValue);
+  const estimateAmountValue = useMemo(() => {
+    if (!selectedService) {
+      return '';
+    }
+
+    if (selectedService.mode === 'fixed' && selectedService.priceFrom) {
+      return String(selectedService.priceFrom);
+    }
+
+    if (selectedService.mode === 'area' && selectedService.priceFrom && areaValue > 0) {
+      return String(selectedService.priceFrom * areaValue);
+    }
+
+    return '';
+  }, [areaValue, selectedService]);
+
 
   const handleChange =
     (field: keyof CalculatorState) =>
@@ -285,6 +301,12 @@ export function EstimateCalculator() {
     payload.set('city', form.city.trim());
     payload.set('service', form.service.trim());
     payload.set('comment', buildPhotoCommentParts().join('\n'));
+    payload.set('objectType', form.objectType.trim());
+    payload.set('needVisit', 'Да');
+
+    if (estimateAmountValue) {
+      payload.set('estimateSum', estimateAmountValue);
+    }
     appendUtmToFormData(payload);
 
     for (const file of photoFiles) {
@@ -370,6 +392,9 @@ export function EstimateCalculator() {
       deal: {
         service: form.service,
         city: form.city,
+        objectType: form.objectType,
+        needVisit: 'Да',
+        ...(estimateAmountValue ? { estimateSum: estimateAmountValue } : {}),
         comment: commentParts.join('\n'),
       },
     };

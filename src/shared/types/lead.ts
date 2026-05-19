@@ -16,6 +16,9 @@ export type LeadRequestPayload = {
   deal: {
     service?: string;
     city?: string;
+    objectType?: string;
+    needVisit?: string;
+    estimateSum?: string;
     comment: string;
   };
 };
