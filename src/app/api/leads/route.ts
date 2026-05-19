@@ -203,16 +203,6 @@ function buildComment(payload: LeadRequestPayload) {
     lines.push(`Telegram: ${payload.client.telegram.trim()}`);
   }
 
-  if (payload.utm && Object.keys(payload.utm).length > 0) {
-    lines.push('');
-    lines.push('UTM:');
-    for (const [key, value] of Object.entries(payload.utm)) {
-      if (isNonEmptyString(value)) {
-        lines.push(`${key}: ${value.trim()}`);
-      }
-    }
-  }
-
   return lines.join('\n');
 }
 

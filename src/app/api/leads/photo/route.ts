@@ -396,17 +396,6 @@ function buildPhotoLeadComment(data: PhotoLeadData, files: File[], uploadedFiles
     `Фото прикреплено к сделке: ${uploadedFiles.length} из ${files.length}`,
   ].filter(Boolean);
 
-  if (Object.keys(data.utm).length > 0) {
-    lines.push('');
-    lines.push('UTM:');
-
-    for (const [key, value] of Object.entries(data.utm)) {
-      if (isNonEmptyString(value)) {
-        lines.push(`${key}: ${value.trim()}`);
-      }
-    }
-  }
-
   return lines.join('\n');
 }
 
