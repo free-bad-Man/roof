@@ -246,6 +246,11 @@ export function LeadForm({
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
+    if ((isMain || isInspection) && photoFiles.length > 0) {
+      await handlePhotoSubmit();
+      return;
+    }
+
     setStatus('pending');
     setErrorMessage('');
 
@@ -493,7 +498,11 @@ export function LeadForm({
                 disabled={status === 'pending'}
                 className="inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
               >
-                {status === 'pending' ? 'Отправляем...' : resolvedSubmitLabel}</button>
+                {status === 'pending'
+                  ? 'Отправляем...'
+                  : photoFiles.length > 0 && (isMain || isInspection)
+                    ? 'Отправить заявку с фото'
+                    : resolvedSubmitLabel}</button>
 
               {(isMain || isInspection) ? (
                 <button

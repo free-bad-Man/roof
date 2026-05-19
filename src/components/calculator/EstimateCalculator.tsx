@@ -330,6 +330,12 @@ export function EstimateCalculator() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
+    if (photoFiles.length > 0) {
+      await handlePhotoSubmit();
+      return;
+    }
+
     setStatus('pending');
     setErrorMessage('');
 
@@ -583,7 +589,11 @@ export function EstimateCalculator() {
               disabled={status === 'pending'}
               className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              {status === 'pending' ? 'Отправляем...' : 'Отправить расчёт менеджеру'}
+              {status === 'pending'
+                ? 'Отправляем...'
+                : photoFiles.length > 0
+                  ? 'Отправить расчёт с фото'
+                  : 'Отправить расчёт менеджеру'}
             </button>
 
             <button
