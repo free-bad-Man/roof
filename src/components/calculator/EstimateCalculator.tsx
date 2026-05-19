@@ -177,6 +177,8 @@ export function EstimateCalculator() {
   });
   const [status, setStatus] = useState<'idle' | 'pending' | 'success' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
 
   const servicesByDirection = useMemo(
     () => SERVICES.filter((item) => item.direction === form.direction),
@@ -223,6 +225,108 @@ export function EstimateCalculator() {
       }));
       setStatus('idle');
     };
+  const handlePhotoFilesChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const nextFiles = Array.from(event.target.files || []).slice(0, 6);
+
+    setPhotoFiles(nextFiles);
+    setStatus('idle');
+    setErrorMessage('');
+  };
+
+  const buildPhotoCommentParts = () => {
+    const areaText = shouldShowArea
+      ? form.area.trim()
+        ? `${form.area.trim()} м²`
+        : 'не указана'
+      : 'не требуется для выбранной услуги';
+
+    return [
+      'Заявка отправлена из калькулятора с фото',
+      `Направление: ${form.direction}`,
+      `Услуга: ${form.service}`,
+      `Город: ${form.city}`,
+      `Тип объекта: ${form.objectType}`,
+      `Площадь: ${areaText}`,
+      `Предварительный расчёт: ${calculationLabel}`,
+      form.comment.trim() ? `Комментарий клиента: ${form.comment.trim()}` : '',
+    ].filter(Boolean);
+  };
+
+  const handlePhotoSubmit = async () => {
+    if (
+      !form.name.trim() ||
+      !form.phone.trim() ||
+      !form.city.trim() ||
+      !form.objectType.trim() ||
+      !form.service.trim() ||
+      (shouldShowArea && !form.area.trim())
+    ) {
+      setStatus('error');
+      setErrorMessage('Заполните обязательные поля калькулятора перед отправкой фото.');
+      return;
+    }
+
+    if (photoFiles.length === 0) {
+      setStatus('error');
+      setErrorMessage('Прикрепите хотя бы одно фото объекта.');
+      return;
+    }
+
+    setStatus('pending');
+    setErrorMessage('');
+
+    const payload = new FormData();
+    payload.set('source', 'Сайт');
+    payload.set('formName', 'Сайт — Калькулятор / фото');
+    payload.set('pagePath', pathname);
+    payload.set('name', form.name.trim());
+    payload.set('phone', form.phone.trim());
+    payload.set('city', form.city.trim());
+    payload.set('service', form.service.trim());
+    payload.set('comment', buildPhotoCommentParts().join('\n'));
+
+    for (const file of photoFiles) {
+      payload.append('photos', file);
+    }
+
+    try {
+      const response = await fetch('/api/leads/photo/', {
+        method: 'POST',
+        body: payload,
+      });
+
+      const result = (await response.json().catch(() => null)) as {
+        ok?: boolean;
+        message?: string;
+      } | null;
+
+      if (!response.ok || !result?.ok) {
+        throw new Error(result?.message || 'Не удалось отправить фото.');
+      }
+
+      setStatus('success');
+      setForm({
+        direction: INITIAL_DIRECTION,
+        service: INITIAL_SERVICE,
+        area: '',
+        city: '',
+        objectType: '',
+        name: '',
+        phone: '',
+        comment: '',
+      });
+      setPhotoFiles([]);
+      setPhotoInputKey((prev) => prev + 1);
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(
+        error instanceof Error
+          ? error.message
+          : 'Не удалось отправить фото. Попробуйте ещё раз.',
+      );
+    }
+  };
+
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -454,12 +558,41 @@ export function EstimateCalculator() {
               />
             </div>
 
+            <div className="mt-4">
+              <label htmlFor="calculator-photos" className="mb-2 block text-sm font-semibold text-[var(--brand-graphite)]/78">
+                Фото объекта
+              </label>
+              <input
+                key={photoInputKey}
+                id="calculator-photos"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handlePhotoFilesChange}
+                className="w-full rounded-[16px] border border-white/25 bg-white/70 px-4 py-3 text-[15px] text-[var(--brand-graphite)] outline-none transition file:mr-4 file:rounded-xl file:border-0 file:bg-red-600 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white hover:file:bg-red-700 focus:border-red-300 focus:bg-white"
+              />
+              <p className="mt-2 text-sm leading-6 text-[var(--brand-muted)]">
+                {photoFiles.length > 0
+                  ? `${photoFiles.length} файл(ов) выбрано. До 6 фото, до 8 МБ каждое.`
+                  : 'Можно прикрепить 1–6 фото объекта.'}
+              </p>
+            </div>
+
             <button
               type="submit"
               disabled={status === 'pending'}
               className="mt-5 inline-flex min-h-12 w-full items-center justify-center rounded-xl bg-red-600 px-6 text-sm font-semibold text-white transition hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {status === 'pending' ? 'Отправляем...' : 'Отправить расчёт менеджеру'}
+            </button>
+
+            <button
+              type="button"
+              onClick={handlePhotoSubmit}
+              disabled={status === 'pending'}
+              className="mt-3 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-white/75 px-6 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
+            >
+              {status === 'pending' ? 'Отправляем...' : 'Прикрепить фото'}
             </button>
 
             {status === 'success' ? (

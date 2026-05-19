@@ -176,7 +176,7 @@ export function LeadForm({
     const comment = [baseComment, 'Нужен выезд: да / по ситуации.']
       .filter(Boolean)
       .join('\n\n');
-    const city = isMain ? '' : form.city.trim();
+    const city = form.city.trim();
 
     if (!form.name.trim() || !form.phone.trim() || !city || !resolvedService || !baseComment) {
       setStatus('error');
@@ -253,7 +253,7 @@ export function LeadForm({
     const comment = isInspection
       ? [baseComment, 'Нужен выезд: да / по ситуации.'].filter(Boolean).join('\n\n')
       : baseComment;
-    const city = isMain ? '' : form.city.trim();
+    const city = form.city.trim();
 
     const payload: LeadRequestPayload = {
       source: 'Сайт',
@@ -388,7 +388,7 @@ export function LeadForm({
                 />
               </div>
 
-              {!isMain ? (
+              {!isService ? (
                 <div>
                   <label
                     htmlFor={`${variant}-city`}
@@ -461,7 +461,7 @@ export function LeadForm({
                   required
                 />
               </div>
-              {isInspection ? (
+              {(isMain || isInspection) ? (
                 <div>
                   <label
                     htmlFor={`${variant}-photos`}
@@ -495,14 +495,14 @@ export function LeadForm({
               >
                 {status === 'pending' ? 'Отправляем...' : resolvedSubmitLabel}</button>
 
-              {isInspection ? (
+              {(isMain || isInspection) ? (
                 <button
                   type="button"
                   onClick={handlePhotoSubmit}
                   disabled={status === 'pending'}
                   className="-mt-1 inline-flex min-h-12 w-full items-center justify-center rounded-xl border border-white/25 bg-white/75 px-6 text-sm font-semibold text-[var(--brand-graphite)] transition hover:bg-white disabled:cursor-not-allowed disabled:opacity-70"
                 >
-                  {status === 'pending' ? 'Отправляем...' : 'Отправить фото'}
+                  {status === 'pending' ? 'Отправляем...' : 'Прикрепить фото'}
                 </button>
               ) : null}
 
