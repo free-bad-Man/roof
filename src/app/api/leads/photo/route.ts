@@ -395,6 +395,7 @@ function normalizeAmoServiceValue(value: string | undefined) {
 
   return serviceMap[trimmed] || trimmed;
 }
+
 function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) {
   const items: Array<{
     field_id: number;
@@ -412,7 +413,6 @@ function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) 
     });
   };
 
-
   const pushNumericField = (fieldId: number | undefined, value: string | undefined) => {
     if (!fieldId || !isNonEmptyString(value)) {
       return;
@@ -429,6 +429,7 @@ function buildPhotoLeadCustomFields(data: PhotoLeadData, fieldIds: AmoFieldIds) 
       values: [{ value: numeric }],
     });
   };
+
   pushField(fieldIds.source, data.source);
   pushField(fieldIds.service, normalizeAmoServiceValue(data.service));
   pushField(fieldIds.city, data.city);
@@ -842,6 +843,7 @@ function getUtmFromFormData(formData: FormData) {
 
   return utm;
 }
+
 function getPhotoFiles(formData: FormData) {
   return formData
     .getAll('photos')

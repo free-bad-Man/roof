@@ -265,6 +265,7 @@ function buildLeadCustomFields(
       values: [{ value: numeric }],
     });
   };
+
   pushField(fieldIds.source, payload.source);
   pushField(fieldIds.service, normalizeAmoServiceValue(payload.deal.service));
   pushField(fieldIds.city, payload.deal.city);
